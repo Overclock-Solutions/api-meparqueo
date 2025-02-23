@@ -27,7 +27,7 @@ enum ParkingLotAvailability {
 enum GlobalStatus {
   ACTIVE
   INACTIVE
-  DELETE
+  DELETED
 }
 
 model User {
