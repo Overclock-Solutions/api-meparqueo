@@ -4,9 +4,10 @@ import { LoggerConfiguredModule } from './lib/Logger';
 import { PrismaService } from './core/prisma.service';
 import { ResponseInterceptor } from './lib/ResponseInterceptor';
 import { AuthModule } from './modules/auth/auth.module';
+import { ParkingLotModule } from './modules/parking-lot/parking-lot.module';
 
 @Module({
-  imports: [LoggerConfiguredModule, AuthModule],
+  imports: [LoggerConfiguredModule, AuthModule, ParkingLotModule],
   controllers: [AppController],
   providers: [PrismaService, ResponseInterceptor],
 })
