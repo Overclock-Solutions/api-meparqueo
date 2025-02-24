@@ -73,6 +73,10 @@ export class ParkingLotService extends Service {
       },
     });
 
+    this.logger.debug(
+      `Updated parking lot ${code} status: ${data.status} and availability: ${data.availability}`,
+    );
+
     return updated;
   }
 
