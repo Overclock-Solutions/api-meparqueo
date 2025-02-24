@@ -29,6 +29,11 @@ if ! npm run lint; then
   exit_with_error "Linting failed. Please fix the issues and try again."
 fi
 
+echo "\n>> Running npm format..\n"
+if ! npm run format; then
+  exit_with_error "Formatting failed. Please fix the issues and try again."
+fi
+
 echo ">> Pre-commit Hook completed successfully.\n"
 
 exit 0
