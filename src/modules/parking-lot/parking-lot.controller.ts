@@ -66,14 +66,14 @@ export class ParkingLotController {
 
   @Patch(':id/status')
   async updateEstatus(
-    @Param('id') id: string,
+    @Param('code') code: string,
     @Body()
     updateDto: {
       status?: ParkingLotStatus;
       availability?: ParkingLotAvailability;
     },
   ): Promise<ParkingLot> {
-    return this.parkingLotService.updateEstatus(id, updateDto);
+    return this.parkingLotService.updateEstatus(code, updateDto);
   }
 
   @Get('/find-nearby')

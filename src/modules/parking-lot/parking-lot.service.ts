@@ -52,12 +52,12 @@ export class ParkingLotService extends Service {
 
   // Actualizar estado y disponibilidad y guardar historial
   async updateEstatus(
-    parkingLotId: string,
+    code: string,
     data: { status?: ParkingLotStatus; availability?: ParkingLotAvailability },
   ): Promise<ParkingLot> {
     // Actualizar el parqueadero
     const updated = await this.prisma.parkingLot.update({
-      where: { id: parkingLotId },
+      where: { code },
       data: {
         status: data.status,
         availability: data.availability,
@@ -67,7 +67,7 @@ export class ParkingLotService extends Service {
     // Registrar en historial
     await this.prisma.parkingLotHistory.create({
       data: {
-        parkingLotId,
+        parkingLotId: updated.id,
         status: data.status ?? updated.status,
         availability: data.availability ?? updated.availability,
       },
