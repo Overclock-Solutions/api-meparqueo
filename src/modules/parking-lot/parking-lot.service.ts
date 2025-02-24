@@ -24,7 +24,6 @@ export class ParkingLotService extends Service {
   async findAll(): Promise<ParkingLot[]> {
     return this.prisma.parkingLot.findMany({
       where: { globalStatus: GlobalStatus.ACTIVE },
-      include: { histories: true },
     });
   }
 
@@ -32,7 +31,6 @@ export class ParkingLotService extends Service {
   async findOne(id: string): Promise<ParkingLot> {
     return this.prisma.parkingLot.findUnique({
       where: { id },
-      include: { histories: true },
     });
   }
 
@@ -53,7 +51,7 @@ export class ParkingLotService extends Service {
   }
 
   // Actualizar estado y disponibilidad y guardar historial
-  async updateEstatusAndAvailability(
+  async updateEstatus(
     parkingLotId: string,
     data: { status?: ParkingLotStatus; availability?: ParkingLotAvailability },
   ): Promise<ParkingLot> {
@@ -84,5 +82,56 @@ export class ParkingLotService extends Service {
       where: { id },
       data: { globalStatus: GlobalStatus.DELETED },
     });
+  }
+
+  async findNearby(lat: number, lng: number, radiusKm: number) {
+    // 0. Validaciones
+    if (!lat || !lng || !radiusKm) {
+      throw new Error('Invalid parameters');
+    }
+
+    if (radiusKm <= 0) {
+      throw new Error('Invalid radius');
+    }
+
+    // 1. Calcular el cuadro delimitador (optimizado)
+    const earthRadiusKm = 6371;
+    const deltaLat = radiusKm / 111.2; // 1 grado ≈ 111.2 km
+    const deltaLng = radiusKm / (111.2 * Math.cos((lat * Math.PI) / 180));
+
+    // 2. Filtrar candidatos dentro del cuadro delimitador
+    const candidates = await this.prisma.parkingLot.findMany({
+      where: {
+        latitude: {
+          gte: lat - deltaLat,
+          lte: lat + deltaLat,
+        },
+        longitude: {
+          gte: lng - deltaLng,
+          lte: lng + deltaLng,
+        },
+        availability: {
+          not: ParkingLotAvailability.NO_AVAILABILITY,
+        },
+      },
+    });
+
+    // 3. Filtrar con Haversine para obtener resultados precisos
+    const nearbyParkings = candidates.filter((parkingLot) => {
+      const R = earthRadiusKm;
+      const dLat = (parkingLot.latitude - lat) * (Math.PI / 180);
+      const dLng = (parkingLot.longitude - lng) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat * (Math.PI / 180)) *
+          Math.cos(parkingLot.latitude * (Math.PI / 180)) *
+          Math.sin(dLng / 2) *
+          Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+      return distance <= radiusKm;
+    });
+
+    return nearbyParkings;
   }
 }
