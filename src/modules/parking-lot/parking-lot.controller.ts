@@ -64,7 +64,7 @@ export class ParkingLotController {
     return this.parkingLotService.getHistory(id);
   }
 
-  @Patch(':id/status')
+  @Patch(':code/status')
   async updateEstatus(
     @Param('code') code: string,
     @Body()
