@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ParkingLotService } from './parking-lot.service';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
@@ -18,6 +19,7 @@ import {
   Role,
 } from '@prisma/client';
 import { Auth } from '../auth/decorators/auth.decorator';
+import { NearbyParamsDto } from './dto/nearby-param.dto';
 
 @Controller('parking-lot')
 export class ParkingLotController {
@@ -76,11 +78,11 @@ export class ParkingLotController {
 
   @Get('/find-nearby')
   @Auth([Role.USER])
-  async findNearby(
-    @Query('lat') lat: number,
-    @Query('lng') lng: number,
-    @Query('radiusKm') radiusKm: number,
-  ) {
-    return this.parkingLotService.findNearby(lat, lng, radiusKm);
+  async findNearby(@Query(ValidationPipe) query: NearbyParamsDto) {
+    return this.parkingLotService.findNearby(
+      query.lat,
+      query.lng,
+      query.radiusKm,
+    );
   }
 }

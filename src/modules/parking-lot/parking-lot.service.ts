@@ -85,11 +85,7 @@ export class ParkingLotService extends Service {
   }
 
   async findNearby(lat: number, lng: number, radiusKm: number) {
-    // 0. Validaciones
-    if (!lat || !lng || !radiusKm) {
-      throw new Error('Invalid parameters');
-    }
-
+    // Validar el radio
     if (radiusKm <= 0) {
       throw new Error('Invalid radius');
     }
