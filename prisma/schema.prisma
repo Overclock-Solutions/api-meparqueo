@@ -7,7 +7,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum UserRole {
+enum Role {
   ADMIN
   OWNER
   USER
@@ -34,7 +34,7 @@ model User {
   id          String       @id @default(uuid())
   email       String       @unique
   password    String
-  role        UserRole
+  role        Role         @default(USER)
   status      GlobalStatus @default(ACTIVE)
   parkingLots ParkingLot[]
   createdAt   DateTime     @default(now())
