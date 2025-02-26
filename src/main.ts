@@ -5,7 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './lib/AllExceptionsFilter';
 import { ResponseInterceptor } from './lib/ResponseInterceptor';
-import { setupSwagger } from './lib/SetupSwagger';
+import { setupDocs } from './lib/SetupDocs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,7 +17,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', { exclude: [''] });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -29,7 +29,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(app.get(ResponseInterceptor));
   app.useLogger(app.get(Logger));
 
-  setupSwagger(app);
+  setupDocs(app);
 
   await app.listen(port);
 }
