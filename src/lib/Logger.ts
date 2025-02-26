@@ -27,7 +27,7 @@ type LoggerConfig = {
 
 const loggerConfig: LoggerConfig = {
   pinoHttp: {
-    level: process.env.LOG_LEVEL || 'debug',
+    level: process.env.LOG_LEVEL || 'info',
     transport: {
       target: 'pino-pretty',
       options: {
