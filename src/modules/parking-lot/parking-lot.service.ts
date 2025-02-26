@@ -17,19 +17,19 @@ export class ParkingLotService extends Service {
 
   // Crear un nuevo parqueadero
   async create(data: Prisma.ParkingLotCreateInput): Promise<ParkingLot> {
-    return this.prisma.parkingLot.create({ data });
+    return await this.prisma.parkingLot.create({ data });
   }
 
   // Obtener todos los parqueaderos (para admin)
   async findAll(): Promise<ParkingLot[]> {
-    return this.prisma.parkingLot.findMany({
+    return await this.prisma.parkingLot.findMany({
       where: { globalStatus: GlobalStatus.ACTIVE },
     });
   }
 
   // Obtener un parqueadero por ID
   async findOne(id: string): Promise<ParkingLot> {
-    return this.prisma.parkingLot.findUnique({
+    return await this.prisma.parkingLot.findUnique({
       where: { id },
     });
   }
@@ -44,7 +44,7 @@ export class ParkingLotService extends Service {
 
   // Obtener el historial de actualizaciones de un parqueadero
   async getHistory(parkingLotId: string) {
-    return this.prisma.parkingLotHistory.findMany({
+    return await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
       orderBy: { updatedAt: 'desc' },
     });
@@ -82,7 +82,7 @@ export class ParkingLotService extends Service {
 
   // Eliminar un parqueadero
   async remove(id: string) {
-    return this.prisma.parkingLot.update({
+    return await this.prisma.parkingLot.update({
       where: { id },
       data: { globalStatus: GlobalStatus.DELETED },
     });
