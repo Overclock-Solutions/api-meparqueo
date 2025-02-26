@@ -50,7 +50,7 @@ export class AuthService {
   }
 
   async getMe(userId: string) {
-    return this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { id: userId },
     });
   }
