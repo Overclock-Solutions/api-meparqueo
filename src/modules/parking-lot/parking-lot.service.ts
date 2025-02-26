@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/core/prisma.service';
 import {
   Prisma,
   ParkingLot,
@@ -11,7 +10,7 @@ import { Service } from 'src/service';
 
 @Injectable()
 export class ParkingLotService extends Service {
-  constructor(private prisma: PrismaService) {
+  constructor() {
     super(ParkingLotService.name);
   }
 
