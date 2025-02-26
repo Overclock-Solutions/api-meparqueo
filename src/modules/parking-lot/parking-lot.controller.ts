@@ -33,7 +33,7 @@ import {
   EXAMPLE_FIND_ONE,
   EXAMPLE_GET_HISTORY,
   EXAMPLE_UPDATE_STATUS,
-} from './responses/responses-Iot';
+} from './docs/responses';
 
 @Controller('parking-lot')
 export class ParkingLotController {

@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Service } from 'src/service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService extends Service {
@@ -14,11 +15,19 @@ export class AuthService extends Service {
   async register(dto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
+    const userExists = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (userExists) {
+      throw new UnauthorizedException('El correo electrónico ya está en uso');
+    }
+
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
-        role: dto.role || 'USER',
+        role: Role.USER,
       },
     });
 

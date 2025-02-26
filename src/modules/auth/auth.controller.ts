@@ -1,33 +1,40 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiHeader,
+  ApiOperation,
+  ApiProperty,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ActiveUser } from './decorators/session.decorator';
 import { ResponseMessage } from 'src/decorators/responseMessage.decorator';
 import { Auth } from './decorators/auth.decorator';
+import {
+  RESPONSE_LOGIN_201,
+  RESPONSE_LOGIN_401,
+  RESPONSE_ME_200,
+  RESPONSE_ME_401,
+  RESPONSE_REGISTER_201,
+  RESPONSE_REGISTER_401,
+} from './docs/responses';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Registrar un nuevo usuario' })
+  @ApiOperation({ summary: 'Registro nuevo usuario' })
   @ApiProperty({ type: RegisterDto })
   @ApiResponse({
     status: 201,
-    example: {
-      user: {
-        id: '1',
-        email: 'example@example.com',
-        password: 'password',
-        role: 'USER',
-        status: 'ACTIVE',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    },
+    example: RESPONSE_REGISTER_201,
+  })
+  @ApiResponse({
+    status: 401,
+    example: RESPONSE_REGISTER_401,
   })
   @ResponseMessage('User registered successfully')
   register(@Body() registerDto: RegisterDto) {
@@ -39,18 +46,11 @@ export class AuthController {
   @ApiProperty({ type: LoginDto })
   @ApiResponse({
     status: 201,
-    example: {
-      token: 'adjawd82913u12',
-      user: {
-        id: '1',
-        email: 'example@example.com',
-        password: 'password',
-        role: 'USER',
-        status: 'ACTIVE',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    },
+    example: RESPONSE_LOGIN_201,
+  })
+  @ApiResponse({
+    status: 401,
+    example: RESPONSE_LOGIN_401,
   })
   @ResponseMessage('User logged in successfully')
   login(@Body() loginDto: LoginDto) {
@@ -58,20 +58,18 @@ export class AuthController {
   }
 
   @Get('me')
-  @ApiOperation({ summary: 'Obtener detalles del usuario autenticado' })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer token',
+  })
+  @ApiOperation({ summary: 'Obtener perfil' })
   @ApiResponse({
     status: 200,
-    example: {
-      user: {
-        id: '1',
-        email: 'example@example.com',
-        password: 'password',
-        role: 'USER',
-        status: 'ACTIVE',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    },
+    example: RESPONSE_ME_200,
+  })
+  @ApiResponse({
+    status: 401,
+    example: RESPONSE_ME_401,
   })
   @Auth()
   @ResponseMessage('User details retrieved successfully')
