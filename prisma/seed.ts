@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import {
   PrismaClient,
   Role,
   ParkingLotStatus,
   ParkingLotAvailability,
   GlobalStatus,
+  Version,
 } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -42,6 +44,22 @@ async function main() {
     },
   });
 
+  const node1 = await prisma.node.create({
+    data: {
+      code: 'ND001',
+      version: Version.BETA,
+      globalStatus: GlobalStatus.ACTIVE,
+    },
+  });
+
+  await prisma.node.create({
+    data: {
+      code: 'ND002',
+      version: Version.BETA,
+      globalStatus: GlobalStatus.ACTIVE,
+    },
+  });
+
   // Crear parqueaderos asignados al usuario owner
   const parkingLot1 = await prisma.parkingLot.create({
     data: {
@@ -55,6 +73,9 @@ async function main() {
       globalStatus: GlobalStatus.ACTIVE,
       owner: {
         connect: { id: ownerUser.id },
+      },
+      node: {
+        connect: { id: node1.id },
       },
     },
   });
@@ -70,6 +91,7 @@ async function main() {
     ],
   });
 
+  // eslint-disable-next-line no-console
   console.log('Seed data created successfully!');
 }
 

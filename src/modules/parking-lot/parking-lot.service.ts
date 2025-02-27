@@ -1,50 +1,71 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/core/prisma.service';
-import {
-  Prisma,
-  ParkingLot,
-  ParkingLotStatus,
-  ParkingLotAvailability,
-  GlobalStatus,
-} from '@prisma/client';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { ParkingLot, GlobalStatus, ParkingLotStatus } from '@prisma/client';
 import { Service } from 'src/service';
+import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 
 @Injectable()
 export class ParkingLotService extends Service {
-  constructor(private prisma: PrismaService) {
+  constructor() {
     super(ParkingLotService.name);
   }
 
   // Crear un nuevo parqueadero
-  async create(data: Prisma.ParkingLotCreateInput): Promise<ParkingLot> {
-    return this.prisma.parkingLot.create({ data });
+  async create(data: CreateParkingLotDto): Promise<ParkingLot> {
+    const existing = await this.prisma.parkingLot.findFirst({
+      where: { code: data.code },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        `Parking lot with code ${data.code} already exists`,
+      );
+    }
+
+    return await this.prisma.parkingLot.create({ data });
   }
 
   // Obtener todos los parqueaderos (para admin)
   async findAll(): Promise<ParkingLot[]> {
-    return this.prisma.parkingLot.findMany({
+    return await this.prisma.parkingLot.findMany({
       where: { globalStatus: GlobalStatus.ACTIVE },
     });
   }
 
   // Obtener un parqueadero por ID
   async findOne(id: string): Promise<ParkingLot> {
-    return this.prisma.parkingLot.findUnique({
+    return await this.prisma.parkingLot.findUnique({
       where: { id },
     });
   }
 
   // Actualizar un parqueadero
-  async update(
-    id: string,
-    data: Prisma.ParkingLotUpdateInput,
-  ): Promise<ParkingLot> {
+  async update(id: string, data: UpdateParkingLotDto): Promise<ParkingLot> {
+    const updateParking = await this.prisma.parkingLot.findUnique({
+      where: { id },
+    });
+
+    if (!updateParking) {
+      throw new ConflictException(`Parking lot with id ${id} does not exist`);
+    }
+
+    const existing = await this.prisma.parkingLot.findFirst({
+      where: { code: data.code, NOT: { id } },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        `Parking lot with code ${data.code} already exists`,
+      );
+    }
+
     return this.prisma.parkingLot.update({ where: { id }, data });
   }
 
   // Obtener el historial de actualizaciones de un parqueadero
   async getHistory(parkingLotId: string) {
-    return this.prisma.parkingLotHistory.findMany({
+    return await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
       orderBy: { updatedAt: 'desc' },
     });
@@ -53,7 +74,7 @@ export class ParkingLotService extends Service {
   // Actualizar estado y disponibilidad y guardar historial
   async updateEstatus(
     code: string,
-    data: { status?: ParkingLotStatus; availability?: ParkingLotAvailability },
+    data: UpdateStatusDto,
   ): Promise<ParkingLot> {
     // Actualizar el parqueadero
     const updated = await this.prisma.parkingLot.update({
@@ -82,54 +103,21 @@ export class ParkingLotService extends Service {
 
   // Eliminar un parqueadero
   async remove(id: string) {
-    return this.prisma.parkingLot.update({
+    return await this.prisma.parkingLot.update({
       where: { id },
       data: { globalStatus: GlobalStatus.DELETED },
     });
   }
 
   async findNearby(lat: number, lng: number, radiusKm: number) {
-    // Validar el radio
-    if (radiusKm <= 0) {
-      throw new Error('Invalid radius');
-    }
-
-    // 1. Calcular el cuadro delimitador (optimizado)
-    const earthRadiusKm = 6371;
-    const deltaLat = radiusKm / 111.2; // 1 grado ≈ 111.2 km
-    const deltaLng = radiusKm / (111.2 * Math.cos((lat * Math.PI) / 180));
-
-    // 2. Filtrar candidatos dentro del cuadro delimitador
-    const candidates = await this.prisma.parkingLot.findMany({
+    // TODO: Implementar lógica para buscar parqueaderos cercanos
+    this.logger.debug(
+      `Finding nearby parking lots for lat: ${lat}, lng: ${lng}, radius: ${radiusKm} km`,
+    );
+    const nearbyParkings = await this.prisma.parkingLot.findMany({
       where: {
-        latitude: {
-          gte: lat - deltaLat,
-          lte: lat + deltaLat,
-        },
-        longitude: {
-          gte: lng - deltaLng,
-          lte: lng + deltaLng,
-        },
-        availability: {
-          not: ParkingLotAvailability.NO_AVAILABILITY,
-        },
+        status: ParkingLotStatus.OPEN,
       },
-    });
-
-    // 3. Filtrar con Haversine para obtener resultados precisos
-    const nearbyParkings = candidates.filter((parkingLot) => {
-      const R = earthRadiusKm;
-      const dLat = (parkingLot.latitude - lat) * (Math.PI / 180);
-      const dLng = (parkingLot.longitude - lng) * (Math.PI / 180);
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat * (Math.PI / 180)) *
-          Math.cos(parkingLot.latitude * (Math.PI / 180)) *
-          Math.sin(dLng / 2) *
-          Math.sin(dLng / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-      return distance <= radiusKm;
     });
 
     return nearbyParkings;
