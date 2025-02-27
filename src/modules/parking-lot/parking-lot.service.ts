@@ -9,6 +9,7 @@ import { Service } from 'src/service';
 import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 
+
 @Injectable()
 export class ParkingLotService extends Service {
   constructor() {
@@ -16,7 +17,7 @@ export class ParkingLotService extends Service {
   }
 
   // Crear un nuevo parqueadero
-  async create(data: Prisma.ParkingLotCreateInput): Promise<ParkingLot> {
+  async create(data: CreateParkingLotDto): Promise<ParkingLot> {
     const existing = await this.prisma.parkingLot.findFirst({
       where: { code: data.code },
     });

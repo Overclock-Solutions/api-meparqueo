@@ -104,4 +104,8 @@ export class CreateParkingLotDto {
   @IsString()
   @IsOptional()
   readonly ownerId?: string;
+
+  @IsString()
+  @IsOptional()
+  readonly nodeId?: string;
 }
