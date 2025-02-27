@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { User } from '@prisma/client';
 

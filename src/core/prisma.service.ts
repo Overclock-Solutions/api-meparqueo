@@ -1,11 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 
+//CLASE QUE SE CONECTA CON PRISMA
 @Injectable()
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  //CONFIGURACIÓN DE LOS LOGS
   constructor() {
     super({
       log: ['error', 'warn'],

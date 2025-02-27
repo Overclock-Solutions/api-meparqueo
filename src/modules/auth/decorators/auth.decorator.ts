@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
