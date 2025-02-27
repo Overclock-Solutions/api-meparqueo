@@ -1,14 +1,9 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import {
-  Prisma,
-  ParkingLot,
-  GlobalStatus,
-  ParkingLotStatus,
-} from '@prisma/client';
+import { ParkingLot, GlobalStatus, ParkingLotStatus } from '@prisma/client';
 import { Service } from 'src/service';
 import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
-
+import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 
 @Injectable()
 export class ParkingLotService extends Service {
