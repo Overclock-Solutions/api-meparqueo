@@ -5,13 +5,12 @@ import {
 } from '@nestjs/common';
 import { GlobalStatus, Node } from '@prisma/client';
 import { Service } from 'src/service';
-import { PrismaService } from 'src/core/prisma.service';
 import { CreateNodeDto } from './dto/create-node.dto';
 import { UpdateNodeDto } from './dto/update-node.dto';
 
 @Injectable()
 export class NodeService extends Service {
-  constructor(private prisma: PrismaService) {
+  constructor() {
     super(NodeService.name);
   }
 
