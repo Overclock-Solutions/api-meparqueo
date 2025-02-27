@@ -1,5 +1,6 @@
 import { LoggerModule } from 'nestjs-pino';
 import { IncomingMessage, ServerResponse } from 'http';
+import { ConfigService } from '@nestjs/config';
 
 type LoggerConfig = {
   pinoHttp: {
@@ -25,33 +26,32 @@ type LoggerConfig = {
   };
 };
 
-const loggerConfig: LoggerConfig = {
-  pinoHttp: {
-    level: process.env.LOG_LEVEL || 'debug',
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'SYS:standard',
-        singleLine: true,
-        ignore: 'pid,hostname',
-      },
-    },
-    serializers: {
-      req: (req: IncomingMessage & { method?: string; url?: string }) => ({
-        method: req.method || 'unknown',
-        url: req.url || 'unknown',
-      }),
-      res: (res: ServerResponse & { statusCode?: number }) => ({
-        statusCode: res.statusCode || 0,
-      }),
-    },
-  },
-};
-
 const loggerConfigAsync = {
-  useFactory: async (): Promise<LoggerConfig> => {
-    return loggerConfig;
+  inject: [ConfigService],
+  useFactory: async (configService: ConfigService): Promise<LoggerConfig> => {
+    return {
+      pinoHttp: {
+        level: configService.get<string>('LOG_LEVEL', 'info'),
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            singleLine: true,
+            ignore: 'pid,hostname',
+          },
+        },
+        serializers: {
+          req: (req: IncomingMessage & { method?: string; url?: string }) => ({
+            method: req.method || 'unknown',
+            url: req.url || 'unknown',
+          }),
+          res: (res: ServerResponse & { statusCode?: number }) => ({
+            statusCode: res.statusCode || 0,
+          }),
+        },
+      },
+    };
   },
 };
 
