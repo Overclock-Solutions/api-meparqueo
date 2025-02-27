@@ -1,11 +1,11 @@
-export const EXAMPLE_FIND_ALL = {
+export const RESPONSE_FIND_ALL = {
   statusCode: 200,
-  timestamp: '2025-02-25T18:42:16.162Z',
+  timestamp: '2025-02-26T19:44:53.236Z',
   success: true,
-  message: 'OK',
+  message: 'Parking lots found',
   data: [
     {
-      id: 'ab068f85-76fb-46ed-b192-4d9664156011',
+      id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
       code: 'P001',
       name: 'Parqueadero',
       address: 'Calle 27 &, Av. 1, Montería',
@@ -14,19 +14,20 @@ export const EXAMPLE_FIND_ALL = {
       status: 'OPEN',
       availability: 'MORE_THAN_FIVE',
       globalStatus: 'ACTIVE',
-      createdAt: '2025-02-25T06:06:58.902Z',
-      updatedAt: '2025-02-25T06:06:58.902Z',
-      ownerId: '5e21e6b8-61dc-4936-85ca-b77dc72359c6',
+      createdAt: '2025-02-26T19:33:47.899Z',
+      updatedAt: '2025-02-26T19:33:47.899Z',
+      ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
     },
   ],
 };
-export const EXAMPLE_FIND_ONE = {
+
+export const RESPONSE_FIND_ONE = {
   statusCode: 200,
-  timestamp: '2025-02-25T18:48:44.162Z',
+  timestamp: '2025-02-26T19:49:03.065Z',
   success: true,
-  message: 'OK',
+  message: 'Parking lot found',
   data: {
-    id: 'ab068f85-76fb-46ed-b192-4d9664156011',
+    id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
     code: 'P001',
     name: 'Parqueadero',
     address: 'Calle 27 &, Av. 1, Montería',
@@ -35,51 +36,176 @@ export const EXAMPLE_FIND_ONE = {
     status: 'OPEN',
     availability: 'MORE_THAN_FIVE',
     globalStatus: 'ACTIVE',
-    createdAt: '2025-02-25T06:06:58.902Z',
-    updatedAt: '2025-02-25T06:06:58.902Z',
-    ownerId: '5e21e6b8-61dc-4936-85ca-b77dc72359c6',
+    createdAt: '2025-02-26T19:33:47.899Z',
+    updatedAt: '2025-02-26T19:33:47.899Z',
+    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
   },
 };
 
-export const EXAMPLE_GET_HISTORY = {
+export const RESPONSE_GET_HISTORY = {
   statusCode: 200,
-  timestamp: '2025-02-25T19:04:08.860Z',
+  timestamp: '2025-02-27T05:17:27.637Z',
   success: true,
   message: 'OK',
   data: [
     {
-      id: 'bab8adda-dd56-4810-be5a-1f5459b2065d',
-      parkingLotId: 'ab068f85-76fb-46ed-b192-4d9664156011',
+      id: '1e4661d6-4881-4c99-ab61-824feb484af1',
+      parkingLotId: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
+      status: 'OPEN',
+      availability: 'MORE_THAN_FIVE',
+      updatedAt: '2025-02-26T20:00:04.748Z',
+    },
+    {
+      id: 'e20bff33-fa73-49bf-868e-77edcb35133a',
+      parkingLotId: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
+      status: 'OPEN',
+      availability: 'MORE_THAN_FIVE',
+      updatedAt: '2025-02-26T19:58:10.416Z',
+    },
+    {
+      id: '7952a013-b3a5-4998-b5e0-ad13dfa16d95',
+      parkingLotId: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
+      status: 'OPEN',
+      availability: 'MORE_THAN_FIVE',
+      updatedAt: '2025-02-26T19:49:57.160Z',
+    },
+    {
+      id: '49d173b1-ec24-4954-a51e-ec461a767177',
+      parkingLotId: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
       status: 'CLOSED',
       availability: 'NO_AVAILABILITY',
-      updatedAt: '2025-02-25T06:06:58.923Z',
+      updatedAt: '2025-02-26T19:33:47.917Z',
     },
   ],
 };
 
-export const EXAMPLE_UPDATE_STATUS = {
-  type: 'object',
-  properties: {
-    status: {
-      type: 'string',
-      enum: ['OPEN', 'CLOSED'],
-    },
-    availability: {
-      type: 'string',
-      enum: [
-        'MORE_THAN_FIVE',
-        'BETWEEN_ONE_AND_FIVE',
-        'LESS_THAN_ONE',
-        'NO_AVAILABILITY',
-      ],
-    },
+export const RESPONSE_UPDATE_STATUS = {
+  statusCode: 200,
+  timestamp: '2025-02-26T19:49:57.174Z',
+  success: true,
+  message: 'Parking lot status updated',
+  data: {
+    id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
+    code: 'P001',
+    name: 'Parqueadero',
+    address: 'Calle 27 &, Av. 1, Montería',
+    latitude: 8.7554462,
+    longitude: -75.8889753,
+    status: 'OPEN',
+    availability: 'MORE_THAN_FIVE',
+    globalStatus: 'ACTIVE',
+    createdAt: '2025-02-26T19:33:47.899Z',
+    updatedAt: '2025-02-26T19:49:57.116Z',
+    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
   },
 };
 
-export const EXAMPLE_FIND_NEARBY = {
+export const RESPONSE_FIND_NEARBY = {
   statusCode: 200,
-  timestamp: '2025-02-26T06:02:08.621Z',
+  timestamp: '2025-02-27T04:52:36.689Z',
   success: true,
-  message: 'OK',
-  data: null,
+  message: 'Parking lots found',
+  data: [
+    {
+      id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
+      code: 'P001',
+      name: 'Parqueadero',
+      address: 'Calle 27 &, Av. 1, Montería',
+      latitude: 8.7554462,
+      longitude: -75.8889753,
+      status: 'OPEN',
+      availability: 'MORE_THAN_FIVE',
+      globalStatus: 'ACTIVE',
+      createdAt: '2025-02-26T19:33:47.899Z',
+      updatedAt: '2025-02-26T20:00:04.744Z',
+      ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
+    },
+  ],
+};
+
+export const RESPONSE_CREATE = {
+  statusCode: 201,
+  timestamp: '2025-02-27T05:07:10.305Z',
+  success: true,
+  message: 'Parking lot created',
+  data: {
+    id: '46c78885-ec61-4708-bbaa-de729abdad91',
+    code: 'P002',
+    name: 'Parqueadero',
+    address: 'Calle 27 &, Av. 1, Montería',
+    latitude: 8.7554462,
+    longitude: -75.8889753,
+    status: 'OPEN',
+    availability: 'MORE_THAN_FIVE',
+    globalStatus: 'ACTIVE',
+    createdAt: '2025-02-27T05:07:10.302Z',
+    updatedAt: '2025-02-27T05:07:10.302Z',
+    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
+  },
+};
+
+export const RESPONSE_UPDATE = {
+  statusCode: 200,
+  timestamp: '2025-02-27T05:12:08.831Z',
+  success: true,
+  message: 'Parking lot created',
+  data: {
+    id: '46c78885-ec61-4708-bbaa-de729abdad91',
+    code: 'P002',
+    name: 'Parqueadero',
+    address: 'Calle 27 &, Av. 1, Montería',
+    latitude: 8.7554462,
+    longitude: -75.8889753,
+    status: 'OPEN',
+    availability: 'MORE_THAN_FIVE',
+    globalStatus: 'ACTIVE',
+    createdAt: '2025-02-27T05:07:10.302Z',
+    updatedAt: '2025-02-27T05:12:08.825Z',
+    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
+  },
+};
+
+export const RESPONSE_DELETE = {
+  statusCode: 200,
+  timestamp: '2025-02-27T05:16:17.016Z',
+  success: true,
+  message: 'Parking lot deleted',
+  data: {
+    id: '46c78885-ec61-4708-bbaa-de729abdad91',
+    code: 'P002',
+    name: 'Parqueadero',
+    address: 'Calle 27 &, Av. 1, Montería',
+    latitude: 8.7554462,
+    longitude: -75.8889753,
+    status: 'OPEN',
+    availability: 'MORE_THAN_FIVE',
+    globalStatus: 'DELETED',
+    createdAt: '2025-02-27T05:07:10.302Z',
+    updatedAt: '2025-02-27T05:16:17.006Z',
+    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
+  },
+};
+
+export const RESPONSE_UNAUTHORIZED_401 = {
+  statusCode: 401,
+  timestamp: '2025-02-26T18:58:05.479Z',
+  success: false,
+  message: 'Something went wrong.',
+  errors: ['Unauthorized'],
+};
+
+export const RESPONSE_FORBIDDEN_403 = {
+  statusCode: 403,
+  timestamp: '2025-02-27T04:57:24.664Z',
+  success: false,
+  message: 'Something went wrong.',
+  errors: ['Forbidden resource'],
+};
+
+export const RESPONSE_CONFLICT_409 = {
+  statusCode: 409,
+  timestamp: '2025-02-27T05:03:16.667Z',
+  success: false,
+  message: 'Something went wrong.',
+  errors: ['Parking lot with code P001 already exists'],
 };

@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   ApiHeader,
   ApiOperation,
@@ -71,7 +71,7 @@ export class AuthController {
     status: 401,
     example: RESPONSE_ME_401,
   })
-  @Auth()
+  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
   @ResponseMessage('User details retrieved successfully')
   async me(@ActiveUser() user: User) {
     return this.authService.getMe(user.id);

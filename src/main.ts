@@ -17,7 +17,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.setGlobalPrefix('api/v1', { exclude: [''] });
+  app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -27,10 +27,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(app.get(ResponseInterceptor));
-  app.useLogger(app.get(Logger));
-
   setupDocs(app);
 
+  app.useLogger(app.get(Logger));
   await app.listen(port);
 }
 bootstrap();
