@@ -17,6 +17,7 @@ export class CreateParkingLotDto {
   @ApiProperty({
     description: 'Codigo del parqueadero',
     type: String,
+    example: 'P001',
   })
   @IsString()
   @IsNotEmpty({
@@ -27,6 +28,7 @@ export class CreateParkingLotDto {
   @ApiProperty({
     description: 'El nombre del parqueadero es obligatorio',
     type: String,
+    example: 'Parqueadero',
   })
   @IsString()
   @IsNotEmpty({
@@ -35,8 +37,9 @@ export class CreateParkingLotDto {
   readonly name: string;
 
   @ApiProperty({
-    description: 'La direccion es obligatoria',
+    description: 'Direccion del parqueadero',
     type: String,
+    example: 'Calle 27 &, Av. 1, Montería',
   })
   @IsString()
   @IsNotEmpty({
@@ -47,6 +50,7 @@ export class CreateParkingLotDto {
   @ApiProperty({
     description: 'Latitud del parqueadero',
     type: Number,
+    example: 8.7554462,
   })
   @IsNumber()
   @Type(() => Number)
@@ -58,6 +62,7 @@ export class CreateParkingLotDto {
   @ApiProperty({
     description: 'La longitud es obligatoria',
     type: Number,
+    example: -75.8889753,
   })
   @IsNumber()
   @IsNotEmpty({
@@ -68,18 +73,24 @@ export class CreateParkingLotDto {
 
   @ApiProperty({
     description: 'Estado del parqueadero',
+    example: 'OPEN',
   })
   @IsEnum(ParkingLotStatus)
   readonly status: ParkingLotStatus;
 
   @ApiProperty({
     description: 'Disponiblidad del parqueadero',
+    example: 'MORE_THAN_FIVE',
   })
   @IsEnum(ParkingLotAvailability)
   readonly availability: ParkingLotAvailability;
 
   @ApiProperty({
-    description: 'Estado global del parqueadero',
+    description: 'Estado global',
+    enum: GlobalStatus,
+    enumName: 'GlobalStatus',
+    required: false,
+    example: 'ACTIVE',
   })
   @IsEnum(GlobalStatus)
   @IsOptional()
@@ -88,6 +99,7 @@ export class CreateParkingLotDto {
   @ApiProperty({
     description: 'Id del dueño',
     type: String,
+    example: '5e21e6b8-61dc-4936-85ca-b77dc72359c6',
   })
   @IsString()
   @IsOptional()
