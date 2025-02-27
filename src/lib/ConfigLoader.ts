@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Config } from 'src/types/config';
 
 export default (): Config => {

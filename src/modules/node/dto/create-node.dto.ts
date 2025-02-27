@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { GlobalStatus, Version } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsLatitude, IsLongitude, IsNumber, IsPositive } from 'class-validator';
 
 export class NearbyParamsDto {

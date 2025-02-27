@@ -10,7 +10,6 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
-    "prisma:seed": "ts-node prisma/seed.ts",
     "prepare": "husky",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

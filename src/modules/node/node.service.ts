@@ -1,6 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-console */
-/* eslint-disable prettier/prettier */
 import {
   ConflictException,
   Injectable,

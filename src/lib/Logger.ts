@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { LoggerModule } from 'nestjs-pino';
 import { IncomingMessage, ServerResponse } from 'http';
 
