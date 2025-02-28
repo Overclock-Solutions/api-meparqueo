@@ -22,7 +22,6 @@ export class ParkingLotService extends Service {
         `Parking lot with code ${data.code} already exists`,
       );
     }
-
     return await this.prisma.parkingLot.create({ data });
   }
 
