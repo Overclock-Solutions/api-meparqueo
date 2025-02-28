@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, GlobalStatus } from '@prisma/client';
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 
 @Injectable()
@@ -11,6 +11,49 @@ export class PrismaService
       log: ['error', 'warn'],
       errorFormat: 'pretty',
     });
+
+    this.$use(async (params, next) => {
+      if (params.model) {
+        if (params.action === 'delete') {
+          params.action = 'update';
+          params.args.data = { globalStatus: GlobalStatus.DELETED };
+        }
+        if (params.action === 'deleteMany') {
+          params.action = 'updateMany';
+          params.args.data = {
+            ...(params.args.data || {}),
+            globalStatus: GlobalStatus.DELETED,
+          };
+        }
+
+        if (params.action === 'findUnique') {
+          params.action = 'findFirst';
+        }
+        if (['findUnique', 'findFirst', 'findMany'].includes(params.action)) {
+          if (params.args.where) {
+            if (params.args.where.globalStatus === undefined) {
+              params.args.where = {
+                AND: [
+                  params.args.where,
+                  {
+                    globalStatus: {
+                      notIn: [GlobalStatus.DELETED, GlobalStatus.ARCHIVED],
+                    },
+                  },
+                ],
+              };
+            }
+          } else {
+            params.args.where = {
+              globalStatus: {
+                notIn: [GlobalStatus.DELETED, GlobalStatus.ARCHIVED],
+              },
+            };
+          }
+        }
+      }
+      return next(params);
+    });
   }
 
   async onModuleInit() {
@@ -19,13 +62,5 @@ export class PrismaService
 
   async onModuleDestroy() {
     await this.$disconnect();
-  }
-
-  async softDelete(model: string, id: string) {
-    const modelAny = this[model as keyof PrismaClient] as any;
-    return modelAny.update({
-      where: { id },
-      data: { globalStatus: 'DELETE' },
-    });
   }
 }

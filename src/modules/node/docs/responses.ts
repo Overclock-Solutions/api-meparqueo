@@ -17,7 +17,7 @@ export const RESPONSE_CONFLICT_NODE_409 = {
   statusCode: 409,
   timestamp: '2025-02-27T20:17:03.544Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ["El código 'NODE003' ya está en uso"],
 };
 
@@ -73,7 +73,7 @@ export const RESPONSE_NOT_FOUND_NODE = {
   statusCode: 404,
   timestamp: '2025-02-27T20:53:47.392Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['Nodo con id4e4eb84d-3855-49a6-a8ec-1355a87s803f3 no existe'],
 };
 
@@ -81,7 +81,7 @@ export const RESPONSE_UPDATE_NODE = {
   statusCode: 200,
   timestamp: '2025-02-27T20:57:01.499Z',
   success: true,
-  message: 'nodo actualizado correctamente',
+  message: 'Nodo actualizado correctamente',
   data: {
     id: '4e4eb84d-3855-49a6-a8ec-1355a87803f3',
     code: 'NODEV2',
@@ -96,7 +96,7 @@ export const RESPONSE_CONFLICT_UPDATE_NODE = {
   statusCode: 409,
   timestamp: '2025-02-27T20:59:58.110Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['No puedes actualizar a este código, porque ya está en uso'],
 };
 
@@ -104,7 +104,7 @@ export const RESPONSE_DELETE_NODE = {
   statusCode: 200,
   timestamp: '2025-02-27T21:04:22.425Z',
   success: true,
-  message: 'nodo eliminado correctamente',
+  message: 'Nodo eliminado correctamente',
   data: {
     id: '4e4eb84d-3855-49a6-a8ec-1355a87803f3',
     code: 'NODEV2',

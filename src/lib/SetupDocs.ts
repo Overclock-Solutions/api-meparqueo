@@ -7,8 +7,8 @@ import {
 
 export function setupDocs(app: INestApplication) {
   const config = new DocumentBuilder()
-    .setTitle('Parqueaderos LoRa API')
-    .setDescription('API para la gestión de parqueaderos usando LoRa')
+    .setTitle('Me Parqueo API')
+    .setDescription('API para Me Parqueo')
     .setVersion('1.0')
     .build();
 
@@ -18,8 +18,8 @@ export function setupDocs(app: INestApplication) {
 
   const stoplightOptions: StoplightElementsOptions = {
     layout: 'sidebar',
-    router: 'history',
-    title: 'Parqueaderos LoRa API',
+    router: 'hash',
+    title: 'Me Parqueo API',
     hideInternal: false,
     hideTryIt: false,
   };
