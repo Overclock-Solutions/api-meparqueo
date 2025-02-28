@@ -76,9 +76,8 @@ export class NodeService extends Service {
       );
     }
 
-    // Actualizar el nodo
     const nodeUpdated = await this.prisma.node.update({
-      where: { id: nodeId }, // ✅ Solo el ID aquí
+      where: { id: nodeId },
       data,
     });
 

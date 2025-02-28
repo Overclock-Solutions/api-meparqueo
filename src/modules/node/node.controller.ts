@@ -3,9 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { NodeService } from './node.service';
 import { CreateNodeDto } from './dto/create-node.dto';
@@ -67,7 +67,7 @@ export class NodeController {
   @Get()
   @Auth([Role.ADMIN])
   @ApiOperation({
-    summary: 'Obtener todos los nodos independiemente de su estado (admin)',
+    summary: 'Obtener todos los nodos (admin)',
   })
   @ApiResponse({
     status: 200,
@@ -91,16 +91,17 @@ export class NodeController {
     status: 404,
     example: RESPONSE_NOT_FOUND_NODE,
   })
-  @ResponseMessage('Nodo encontrado correctamente (admin)')
+  @ResponseMessage('Nodo encontrado correctamente')
   findOne(@Param('nodeId') nodeId: string) {
     return this.nodeService.findOne(nodeId);
   }
 
-  @Patch(':nodeId')
+  @Put(':nodeId')
   @Auth([Role.ADMIN])
   @ApiOperation({
     summary: 'actualizar nodo por id (admin)',
   })
+  @ApiBody({ type: UpdateNodeDto })
   @ApiResponse({
     status: 200,
     example: RESPONSE_UPDATE_NODE,
