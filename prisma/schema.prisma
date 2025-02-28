@@ -27,6 +27,7 @@ enum ParkingLotAvailability {
 enum GlobalStatus {
   ACTIVE
   INACTIVE
+  ARCHIVED
   DELETED
 }
 
@@ -37,14 +38,14 @@ enum Version {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  email       String       @unique
-  password    String
-  role        Role         @default(USER)
-  status      GlobalStatus @default(ACTIVE)
-  parkingLots ParkingLot[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String       @id @default(uuid())
+  email        String       @unique
+  password     String
+  role         Role         @default(USER)
+  globalStatus GlobalStatus @default(ACTIVE)
+  parkingLots  ParkingLot[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model ParkingLot {
@@ -57,21 +58,22 @@ model ParkingLot {
   status       ParkingLotStatus
   availability ParkingLotAvailability
   globalStatus GlobalStatus           @default(ACTIVE)
-  histories    ParkingLotHistory[]
-  node         Node?                  @relation(fields: [nodeId], references: [id])
+  ownerId      String?
   nodeId       String?                @unique
+  owner        User?                  @relation(fields: [ownerId], references: [id])
+  node         Node?                  @relation(fields: [nodeId], references: [id])
+  histories    ParkingLotHistory[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
-  owner        User?                  @relation(fields: [ownerId], references: [id])
-  ownerId      String?
 }
 
 model ParkingLotHistory {
   id           String                 @id @default(uuid())
-  parkingLot   ParkingLot             @relation(fields: [parkingLotId], references: [id])
   parkingLotId String
   status       ParkingLotStatus
   availability ParkingLotAvailability
+  globalStatus GlobalStatus           @default(ACTIVE)
+  parkingLot   ParkingLot             @relation(fields: [parkingLotId], references: [id])
   updatedAt    DateTime               @default(now())
 }
 
@@ -80,7 +82,7 @@ model Node {
   code         String       @unique
   version      Version
   globalStatus GlobalStatus @default(ACTIVE)
-  parkingLot   ParkingLot? 
+  parkingLot   ParkingLot?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }

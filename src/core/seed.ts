@@ -19,10 +19,10 @@ async function main() {
   console.warn('👤 Creando usuarios...');
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@gmail.com',
+      email: 'admin@miparqueo.com',
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
       role: Role.ADMIN,
-      status: GlobalStatus.ACTIVE,
+      globalStatus: GlobalStatus.ACTIVE,
     },
   });
   console.warn(`✅ Usuario admin creado`);

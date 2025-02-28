@@ -102,9 +102,8 @@ export class ParkingLotService extends Service {
 
   // Eliminar un parqueadero
   async remove(id: string) {
-    return await this.prisma.parkingLot.update({
+    return await this.prisma.parkingLot.delete({
       where: { id },
-      data: { globalStatus: GlobalStatus.DELETED },
     });
   }
 
