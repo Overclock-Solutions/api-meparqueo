@@ -9,7 +9,6 @@ import {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
-import { inspect } from 'util';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -18,14 +17,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = context.getResponse();
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errors: string[] = [];
-    // Mensaje estándar que se muestra en la propiedad "message" de la respuesta
     const standardMessage = 'Algo salió mal.';
-
-    // Imprime detalles completos del error para facilitar el debugging
-    console.error(
-      'Detalles de la excepción:',
-      inspect(exception, { depth: null }),
-    );
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
