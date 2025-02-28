@@ -30,6 +30,12 @@ enum GlobalStatus {
   DELETED
 }
 
+enum Version {
+  BETA
+  V1
+  V2
+}
+
 model User {
   id          String       @id @default(uuid())
   email       String       @unique
@@ -77,10 +83,4 @@ model Node {
   parkingLot   ParkingLot? 
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-}
-
-enum Version {
-  BETA
-  V1
-  V2
 }
