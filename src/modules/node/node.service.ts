@@ -76,9 +76,8 @@ export class NodeService extends Service {
       );
     }
 
-    // Actualizar el nodo
     const nodeUpdated = await this.prisma.node.update({
-      where: { id: nodeId }, // ✅ Solo el ID aquí
+      where: { id: nodeId },
       data,
     });
 
@@ -92,9 +91,8 @@ export class NodeService extends Service {
     if (!node) {
       throw new NotFoundException(`El nodo con la ID '${nodeId}' no existe`);
     }
-    const nodeDeleted = await this.prisma.node.update({
+    const nodeDeleted = await this.prisma.node.delete({
       where: { id: nodeId },
-      data: { globalStatus: GlobalStatus.DELETED },
     });
 
     return nodeDeleted;

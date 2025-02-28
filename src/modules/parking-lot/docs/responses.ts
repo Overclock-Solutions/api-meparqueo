@@ -2,7 +2,7 @@ export const RESPONSE_FIND_ALL = {
   statusCode: 200,
   timestamp: '2025-02-26T19:44:53.236Z',
   success: true,
-  message: 'Parking lots found',
+  message: 'Parqueaderos encontrados correctamente',
   data: [
     {
       id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
@@ -25,7 +25,7 @@ export const RESPONSE_FIND_ONE = {
   statusCode: 200,
   timestamp: '2025-02-26T19:49:03.065Z',
   success: true,
-  message: 'Parking lot found',
+  message: 'Parqueadero encontrado correctamente',
   data: {
     id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
     code: 'P001',
@@ -46,7 +46,7 @@ export const RESPONSE_GET_HISTORY = {
   statusCode: 200,
   timestamp: '2025-02-27T05:17:27.637Z',
   success: true,
-  message: 'OK',
+  message: 'Historial del parqueadero obtenido correctamente',
   data: [
     {
       id: '1e4661d6-4881-4c99-ab61-824feb484af1',
@@ -83,7 +83,7 @@ export const RESPONSE_UPDATE_STATUS = {
   statusCode: 200,
   timestamp: '2025-02-26T19:49:57.174Z',
   success: true,
-  message: 'Parking lot status updated',
+  message: 'Estado del parqueadero actualizado correctamente',
   data: {
     id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
     code: 'P001',
@@ -104,7 +104,7 @@ export const RESPONSE_FIND_NEARBY = {
   statusCode: 200,
   timestamp: '2025-02-27T04:52:36.689Z',
   success: true,
-  message: 'Parking lots found',
+  message: 'Parqueaderos cercanos encontrados correctamente',
   data: [
     {
       id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
@@ -127,7 +127,7 @@ export const RESPONSE_CREATE = {
   statusCode: 201,
   timestamp: '2025-02-27T05:07:10.305Z',
   success: true,
-  message: 'Parking lot created',
+  message: 'Parqueadero creado correctamente',
   data: {
     id: '46c78885-ec61-4708-bbaa-de729abdad91',
     code: 'P002',
@@ -148,7 +148,7 @@ export const RESPONSE_UPDATE = {
   statusCode: 200,
   timestamp: '2025-02-27T05:12:08.831Z',
   success: true,
-  message: 'Parking lot created',
+  message: 'Parqueadero actualizado correctamente',
   data: {
     id: '46c78885-ec61-4708-bbaa-de729abdad91',
     code: 'P002',
@@ -169,7 +169,7 @@ export const RESPONSE_DELETE = {
   statusCode: 200,
   timestamp: '2025-02-27T05:16:17.016Z',
   success: true,
-  message: 'Parking lot deleted',
+  message: 'Parqueadero eliminado correctamente',
   data: {
     id: '46c78885-ec61-4708-bbaa-de729abdad91',
     code: 'P002',
@@ -186,26 +186,10 @@ export const RESPONSE_DELETE = {
   },
 };
 
-export const RESPONSE_UNAUTHORIZED_401 = {
-  statusCode: 401,
-  timestamp: '2025-02-26T18:58:05.479Z',
-  success: false,
-  message: 'Something went wrong.',
-  errors: ['Unauthorized'],
-};
-
-export const RESPONSE_FORBIDDEN_403 = {
-  statusCode: 403,
-  timestamp: '2025-02-27T04:57:24.664Z',
-  success: false,
-  message: 'Something went wrong.',
-  errors: ['Forbidden resource'],
-};
-
 export const RESPONSE_CONFLICT_409 = {
   statusCode: 409,
   timestamp: '2025-02-27T05:03:16.667Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['Parking lot with code P001 already exists'],
 };

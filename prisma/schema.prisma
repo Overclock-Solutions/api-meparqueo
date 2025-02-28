@@ -27,18 +27,25 @@ enum ParkingLotAvailability {
 enum GlobalStatus {
   ACTIVE
   INACTIVE
+  ARCHIVED
   DELETED
 }
 
+enum Version {
+  BETA
+  V1
+  V2
+}
+
 model User {
-  id          String       @id @default(uuid())
-  email       String       @unique
-  password    String
-  role        Role         @default(USER)
-  status      GlobalStatus @default(ACTIVE)
-  parkingLots ParkingLot[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String       @id @default(uuid())
+  email        String       @unique
+  password     String
+  role         Role         @default(USER)
+  globalStatus GlobalStatus @default(ACTIVE)
+  parkingLots  ParkingLot[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model ParkingLot {
@@ -51,21 +58,21 @@ model ParkingLot {
   status       ParkingLotStatus
   availability ParkingLotAvailability
   globalStatus GlobalStatus           @default(ACTIVE)
+  ownerId      String?
+  owner        User?                  @relation(fields: [ownerId], references: [id])
+  nodes        Node[]
   histories    ParkingLotHistory[]
-  node         Node?                  @relation(fields: [nodeId], references: [id])
-  nodeId       String?                @unique
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
-  owner        User?                  @relation(fields: [ownerId], references: [id])
-  ownerId      String?
 }
 
 model ParkingLotHistory {
   id           String                 @id @default(uuid())
-  parkingLot   ParkingLot             @relation(fields: [parkingLotId], references: [id])
   parkingLotId String
   status       ParkingLotStatus
   availability ParkingLotAvailability
+  globalStatus GlobalStatus           @default(ACTIVE)
+  parkingLot   ParkingLot             @relation(fields: [parkingLotId], references: [id])
   updatedAt    DateTime               @default(now())
 }
 
@@ -74,13 +81,8 @@ model Node {
   code         String       @unique
   version      Version
   globalStatus GlobalStatus @default(ACTIVE)
-  parkingLot   ParkingLot? 
+  parkingLotId String?
+  parkingLot   ParkingLot?  @relation(fields: [parkingLotId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-}
-
-enum Version {
-  BETA
-  V1
-  V2
 }

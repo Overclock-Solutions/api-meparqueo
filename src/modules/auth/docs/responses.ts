@@ -18,7 +18,7 @@ export const RESPONSE_REGISTER_401 = {
   statusCode: 401,
   timestamp: '2025-02-26T18:37:51.211Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['El correo electrónico ya está en uso'],
 };
 
@@ -46,7 +46,7 @@ export const RESPONSE_LOGIN_401 = {
   statusCode: 401,
   timestamp: '2025-02-26T18:45:20.970Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['Credenciales inválidas'],
 };
 
@@ -70,6 +70,6 @@ export const RESPONSE_ME_401 = {
   statusCode: 401,
   timestamp: '2025-02-26T18:58:05.479Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['Unauthorized'],
 };

@@ -105,7 +105,13 @@ export class CreateParkingLotDto {
   @IsOptional()
   readonly ownerId?: string;
 
-  @IsString()
+  @ApiProperty({
+    description: 'Ids de los nodos',
+    type: [String],
+    example: ['312883d9-cab7-4f22-b6c4-aeae51737ace'],
+    isArray: true,
+  })
+  @IsString({ each: true })
   @IsOptional()
-  readonly nodeId?: string;
+  readonly nodeIds?: string[];
 }
