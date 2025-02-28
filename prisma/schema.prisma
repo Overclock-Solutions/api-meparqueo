@@ -59,9 +59,8 @@ model ParkingLot {
   availability ParkingLotAvailability
   globalStatus GlobalStatus           @default(ACTIVE)
   ownerId      String?
-  nodeId       String?                @unique
   owner        User?                  @relation(fields: [ownerId], references: [id])
-  node         Node?                  @relation(fields: [nodeId], references: [id])
+  nodes        Node[]
   histories    ParkingLotHistory[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
@@ -82,7 +81,8 @@ model Node {
   code         String       @unique
   version      Version
   globalStatus GlobalStatus @default(ACTIVE)
-  parkingLot   ParkingLot?
+  parkingLotId String?
+  parkingLot   ParkingLot?  @relation(fields: [parkingLotId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }

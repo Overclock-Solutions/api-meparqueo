@@ -51,7 +51,7 @@ async function main() {
       owner: {
         connect: { id: admin.id },
       },
-      node: {
+      nodes: {
         connect: { id: node1.id },
       },
     },

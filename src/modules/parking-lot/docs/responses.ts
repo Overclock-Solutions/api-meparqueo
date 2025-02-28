@@ -190,6 +190,6 @@ export const RESPONSE_CONFLICT_409 = {
   statusCode: 409,
   timestamp: '2025-02-27T05:03:16.667Z',
   success: false,
-  message: 'Something went wrong.',
+  message: 'Algo salió mal.',
   errors: ['Parking lot with code P001 already exists'],
 };
