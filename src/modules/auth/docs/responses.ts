@@ -73,3 +73,30 @@ export const RESPONSE_ME_401 = {
   message: 'Algo salió mal.',
   errors: ['Unauthorized'],
 };
+
+export const RESPONSE_OWNER_201 = {
+  statusCode: 201,
+  timestamp: '2025-03-01T08:18:57.627Z',
+  success: true,
+  message: 'Propietario registrado correctamente',
+  data: {
+    id: '679e66eb-e3b1-4b72-b12f-23fa5a0b5329',
+    email: 'example@example.com',
+    password: '$2b$10$9Hr9u77gQtb99mSC8Vz4Fu/l7YJzPH3SO8NuGijBRm1lWKu54rJ9y',
+    personId: 'b6ebc39c-a052-44d2-bb68-0d0bb33d7016',
+    role: 'OWNER',
+    globalStatus: 'ACTIVE',
+    createdAt: '2025-03-01T08:18:57.622Z',
+    updatedAt: '2025-03-01T08:18:57.622Z',
+  },
+};
+
+export const RESPONSE_OWNER_409 = {
+  statusCode: 409,
+  timestamp: '2025-03-01T08:25:30.606Z',
+  success: false,
+  message: 'Algo salió mal.',
+  errors: [
+    'Violación de restricción única en el campo email. El registro ya existe.',
+  ],
+};

@@ -14,9 +14,34 @@ async function main() {
   await prisma.parkingLotHistory.deleteMany({});
   await prisma.parkingLot.deleteMany({});
   await prisma.user.deleteMany({});
+  await prisma.person.deleteMany({});
   await prisma.node.deleteMany({});
 
   console.warn('👤 Creando usuarios...');
+
+  const person = await prisma.person.create({
+    data: {
+      names: 'Andres Felipe',
+      lastNames: 'Suarez Gonzalez',
+      email: 'anfesugo22@gmail.com',
+      phone: '3012345678',
+    },
+  });
+  console.warn(`✅ Persona creada`);
+
+  await prisma.user.create({
+    data: {
+      email: 'anfesugo22@gmail.com',
+      password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
+      role: Role.OWNER,
+      globalStatus: GlobalStatus.ACTIVE,
+      person: {
+        connect: { id: person.id },
+      },
+    },
+  });
+  console.warn(`✅ Usuario propietario creado`);
+
   const admin = await prisma.user.create({
     data: {
       email: 'admin@miparqueo.com',
