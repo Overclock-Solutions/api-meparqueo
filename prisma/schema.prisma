@@ -38,22 +38,23 @@ enum Version {
 }
 
 model Person {
-  id        String   @id @default(uuid())
-  names     String
-  lastNames String
-  email     String   @unique
-  phone     String
-  cretedAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User[]
+  id           String       @id @default(uuid())
+  names        String
+  lastNames    String
+  email        String       @unique
+  phone        String
+  cretedAt     DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User?
+  globalStatus GlobalStatus @default(ACTIVE)
 }
 
 model User {
   id           String       @id @default(uuid())
   email        String       @unique
   password     String
-  person       Person?       @relation(fields: [personId], references: [id])
-  personId     String?
+  person       Person?      @relation(fields: [personId], references: [id])
+  personId     String?      @unique
   role         Role         @default(USER)
   globalStatus GlobalStatus @default(ACTIVE)
   parkingLots  ParkingLot[]

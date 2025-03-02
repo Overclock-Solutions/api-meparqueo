@@ -8,6 +8,7 @@ import { ResponseInterceptor } from './lib/ResponseInterceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { ParkingLotModule } from './modules/parking-lot/parking-lot.module';
 import { NodeModule } from './modules/node/node.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { NodeModule } from './modules/node/node.module';
     AuthModule,
     ParkingLotModule,
     NodeModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, ResponseInterceptor],

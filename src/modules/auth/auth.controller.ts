@@ -19,12 +19,9 @@ import {
   RESPONSE_LOGIN_401,
   RESPONSE_ME_200,
   RESPONSE_ME_401,
-  RESPONSE_OWNER_201,
-  RESPONSE_OWNER_409,
   RESPONSE_REGISTER_201,
   RESPONSE_REGISTER_401,
 } from './docs/responses';
-import { RegisterOwnerDto } from './dto/registerOwner.dto';
 
 @ApiTags('Autenticacion')
 @ApiHeader({
@@ -69,16 +66,5 @@ export class AuthController {
   @ResponseMessage('Perfil del usuario obtenido correctamente')
   async me(@ActiveUser() user: User) {
     return this.authService.getMe(user.id);
-  }
-
-  @Post('owner')
-  @ApiOperation({ summary: 'Registrar un nuevo propietario' })
-  @ApiBody({ type: RegisterOwnerDto })
-  @ApiResponse({ status: 200, example: RESPONSE_OWNER_201 })
-  @ApiResponse({ status: 409, example: RESPONSE_OWNER_409 })
-  @ResponseMessage('Propietario registrado correctamente')
-  @Auth([Role.ADMIN])
-  async createOwner(@Body() dto: RegisterOwnerDto) {
-    return this.authService.createOwner(dto);
   }
 }

@@ -13,6 +13,10 @@ export class PrismaService
     });
 
     this.$use(async (params, next) => {
+      if (!params.args) {
+        return next(params);
+      }
+
       if (params.model) {
         if (params.action === 'delete') {
           params.action = 'update';
@@ -25,33 +29,31 @@ export class PrismaService
             globalStatus: GlobalStatus.DELETED,
           };
         }
+      }
 
-        if (params.action === 'findUnique') {
-          params.action = 'findFirst';
+      if (params.action === 'findUnique') {
+        params.action = 'findFirst';
+      }
+
+      if (['findUnique', 'findFirst', 'findMany'].includes(params.action)) {
+        if (!params.args.where) {
+          params.args.where = {};
         }
-        if (['findUnique', 'findFirst', 'findMany'].includes(params.action)) {
-          if (params.args.where) {
-            if (params.args.where.globalStatus === undefined) {
-              params.args.where = {
-                AND: [
-                  params.args.where,
-                  {
-                    globalStatus: {
-                      notIn: [GlobalStatus.DELETED, GlobalStatus.ARCHIVED],
-                    },
-                  },
-                ],
-              };
-            }
-          } else {
-            params.args.where = {
-              globalStatus: {
-                notIn: [GlobalStatus.DELETED, GlobalStatus.ARCHIVED],
+
+        if (params.args.where.globalStatus === undefined) {
+          params.args.where = {
+            AND: [
+              params.args.where,
+              {
+                globalStatus: {
+                  notIn: [GlobalStatus.DELETED, GlobalStatus.ARCHIVED],
+                },
               },
-            };
-          }
+            ],
+          };
         }
       }
+
       return next(params);
     });
   }

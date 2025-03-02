@@ -1,7 +1,13 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RegisterOwnerDto {
+export class CreateUserDto {
   @ApiProperty({
     description: 'Nombre/s del usuario',
     example: 'Andres Felipe',
@@ -57,4 +63,13 @@ export class RegisterOwnerDto {
     message: 'La contraseña es requerida',
   })
   password: string;
+
+  @ApiProperty({
+    description: 'Rol del usuario',
+    example: 'USER',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  role: string;
 }
