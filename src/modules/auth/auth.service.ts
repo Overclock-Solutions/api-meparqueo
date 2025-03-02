@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Service } from 'src/service';
-import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService extends Service {
@@ -52,6 +52,7 @@ export class AuthService extends Service {
   async getMe(userId: string) {
     return await this.prisma.user.findUnique({
       where: { id: userId },
+      include: { person: true },
     });
   }
 }
