@@ -58,26 +58,29 @@ model User {
   role         Role         @default(USER)
   globalStatus GlobalStatus @default(ACTIVE)
   parkingLots  ParkingLot[]
+  Rating       Rating[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
 
 model ParkingLot {
-  id           String                 @id @default(uuid())
-  code         String                 @unique
-  name         String
-  address      String
-  latitude     Float
-  longitude    Float
-  status       ParkingLotStatus
-  availability ParkingLotAvailability
-  globalStatus GlobalStatus           @default(ACTIVE)
-  ownerId      String?
-  owner        User?                  @relation(fields: [ownerId], references: [id])
-  nodes        Node[]
-  histories    ParkingLotHistory[]
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  id            String                 @id @default(uuid())
+  code          String                 @unique
+  name          String
+  address       String
+  latitude      Float
+  longitude     Float
+  status        ParkingLotStatus
+  availability  ParkingLotAvailability
+  globalStatus  GlobalStatus           @default(ACTIVE)
+  ownerId       String?
+  owner         User?                  @relation(fields: [ownerId], references: [id])
+  nodes         Node[]
+  Rating        Rating[]
+  averageRating Float                  @default(0.0)
+  histories     ParkingLotHistory[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
 }
 
 model ParkingLotHistory {
@@ -99,4 +102,19 @@ model Node {
   parkingLot   ParkingLot?  @relation(fields: [parkingLotId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+}
+
+model Rating {
+  id           String       @id @default(uuid())
+  rating       Int
+  comment      String?
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  parkingLotId String
+  parkingLot   ParkingLot   @relation(fields: [parkingLotId], references: [id])
+  globalStatus GlobalStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([userId, parkingLotId])
 }

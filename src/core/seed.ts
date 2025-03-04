@@ -63,7 +63,7 @@ async function main() {
   console.warn('✅ Nodos creados');
 
   console.warn('🅿️  Creando parqueaderos...');
-  await prisma.parkingLot.create({
+  const parkingLot = await prisma.parkingLot.create({
     data: {
       code: 'P001',
       name: 'Parqueadero',
@@ -82,6 +82,21 @@ async function main() {
     },
   });
   console.warn('✅ Parqueaderos creados');
+
+  await prisma.rating.create({
+    data: {
+      rating: 4.5,
+      comment: 'Excelente parqueadero',
+      globalStatus: GlobalStatus.ACTIVE,
+      user: {
+        connect: { id: admin.id },
+      },
+      parkingLot: {
+        connect: { id: parkingLot.id },
+      },
+    },
+  });
+  console.warn('✅ Calificación creada');
 
   console.warn('🎉 Seed completado exitosamente!');
 }

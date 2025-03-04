@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ParkingLotModule } from './modules/parking-lot/parking-lot.module';
 import { NodeModule } from './modules/node/node.module';
 import { UserModule } from './modules/user/user.module';
+import { RatingModule } from './modules/rating/rating.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from './modules/user/user.module';
     ParkingLotModule,
     NodeModule,
     UserModule,
+    RatingModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, ResponseInterceptor],
