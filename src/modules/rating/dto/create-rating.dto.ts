@@ -29,14 +29,6 @@ export class CreateRatingDto {
   comment?: string;
 
   @ApiProperty({
-    description: 'Id del usuario que realiza la calificación',
-    example: 'aa222aa4-b001-47fb-ad09-07b2e20bbca1',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
-
-  @ApiProperty({
     description: 'Id del parqueadero a la que se realiza la calificación',
     example: 'aa222aa4-b001-47fb-ad09-07b2e20bbca1',
   })

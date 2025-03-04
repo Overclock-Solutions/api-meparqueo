@@ -26,7 +26,6 @@ import {
 } from '../common/docs/responses';
 import {
   RESPONSE_CONFLICT_DELETE_RATING_409,
-  RESPONSE_CONFLICT_RATING_409,
   RESPONSE_CREATE_RATING_201,
   RESPONSE_DELETE_RATING,
   RESPONSE_FIND_ALL_RATINGS_BY_PARKING,
@@ -58,7 +57,6 @@ export class RatingController {
   @ApiOperation({ summary: 'Registrar calificación' })
   @ApiBody({ type: CreateRatingDto })
   @ApiResponse({ status: 201, example: RESPONSE_CREATE_RATING_201 })
-  @ApiResponse({ status: 409, example: RESPONSE_CONFLICT_RATING_409 })
   @ResponseMessage('Calificación creada con exito')
   createOrUpdate(
     @Body() createRatingDto: CreateRatingDto,
@@ -94,17 +92,13 @@ export class RatingController {
     return this.ratingService.findOne(ratingId);
   }
 
-  @Delete('user/:userId/rating/:ratingId')
+  @Delete('rating/:ratingId')
   @Auth([Role.ADMIN, Role.OWNER, Role.USER])
   @ApiResponse({ status: 200, example: RESPONSE_DELETE_RATING })
   @ApiResponse({ status: 409, example: RESPONSE_CONFLICT_DELETE_RATING_409 })
   @ApiResponse({ status: 404, example: RESPONSE_NOT_FOUND_RATING })
   @ResponseMessage('Calificacion eliminada')
-  remove(
-    @Param('userId') userId: string,
-    @Param('ratingId') ratingId: string,
-    @ActiveUser() user: User,
-  ) {
-    return this.ratingService.remove(userId, ratingId, user);
+  remove(@Param('ratingId') ratingId: string, @ActiveUser() user: User) {
+    return this.ratingService.remove(ratingId, user);
   }
 }

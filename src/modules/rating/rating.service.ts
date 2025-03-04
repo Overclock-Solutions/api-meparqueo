@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -11,15 +10,10 @@ import { GlobalStatus, User } from '@prisma/client';
 @Injectable()
 export class RatingService extends Service {
   async createOrUpdateRating(dto: CreateRatingDto, user: User) {
-    if (user.id !== dto.userId) {
-      throw new ConflictException(
-        'No puedes crear este recurso en nombre de otro',
-      );
-    }
     const rating = await this.prisma.rating.upsert({
       where: {
         userId_parkingLotId: {
-          userId: dto.userId,
+          userId: user.id,
           parkingLotId: dto.parkingLotId,
         },
       },
@@ -29,7 +23,7 @@ export class RatingService extends Service {
         globalStatus: GlobalStatus.ACTIVE,
       },
       create: {
-        userId: dto.userId,
+        userId: user.id,
         parkingLotId: dto.parkingLotId,
         rating: dto.rating,
         comment: dto.comment,
@@ -89,10 +83,7 @@ export class RatingService extends Service {
     return rating;
   }
 
-  async remove(userId: string, ratingId: string, user: User) {
-    if (userId !== user.id) {
-      throw new ConflictException('No puedes acceder a este recurso');
-    }
+  async remove(ratingId: string, user: User) {
     const rating = await this.prisma.rating.findUnique({
       where: { id: ratingId },
       select: { userId: true },
@@ -104,7 +95,7 @@ export class RatingService extends Service {
       );
     }
 
-    if (rating.userId !== userId) {
+    if (rating.userId !== user.id) {
       throw new ForbiddenException(
         'No tienes permiso para eliminar esta calificación.',
       );

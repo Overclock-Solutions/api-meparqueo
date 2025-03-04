@@ -58,7 +58,7 @@ model User {
   role         Role         @default(USER)
   globalStatus GlobalStatus @default(ACTIVE)
   parkingLots  ParkingLot[]
-  Rating       Rating[]
+  ratings      Rating[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -76,7 +76,7 @@ model ParkingLot {
   ownerId       String?
   owner         User?                  @relation(fields: [ownerId], references: [id])
   nodes         Node[]
-  Rating        Rating[]
+  ratings       Rating[]
   averageRating Float                  @default(0.0)
   histories     ParkingLotHistory[]
   createdAt     DateTime               @default(now())
