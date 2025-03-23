@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
@@ -30,7 +29,6 @@ import {
   RESPONSE_FIND_NEARBY,
   RESPONSE_FIND_ONE,
   RESPONSE_GET_HISTORY,
-  RESPONSE_UPDATE_STATUS,
   RESPONSE_CONFLICT_409,
   RESPONSE_CREATE,
   RESPONSE_UPDATE,
@@ -86,21 +84,14 @@ export class ParkingLotController {
     return this.parkingLotService.findOne(id);
   }
 
-  @Patch('parking-lot/:code/status')
-  @ApiOperation({ summary: 'Actualizar estado del parqueadero' })
-  @ApiParam({
-    name: 'code',
-    description: 'Código del parqueadero',
-    example: 'P001',
-  })
+  // TODO: Implementar webhook
+  @Post('parking-lot/status')
+  @ApiOperation({ summary: 'Webhook estado parqueadero' })
   @ApiBody({ type: UpdateStatusDto })
-  @ApiResponse({ status: 200, example: RESPONSE_UPDATE_STATUS })
-  @ResponseMessage('Estado del parqueadero actualizado correctamente')
-  async updateStatus(
-    @Param('code') code: string,
-    @Body() updateDto: UpdateStatusDto,
-  ): Promise<ParkingLot> {
-    return this.parkingLotService.updateEstatus(code, updateDto);
+  async updateStatus(@Body() updateDto: any): Promise<ParkingLot> {
+    console.error(updateDto);
+    return;
+    //return this.parkingLotService.updateEstatus(updateDto);
   }
 
   @Get('parking-lot/find/nearby')

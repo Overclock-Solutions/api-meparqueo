@@ -4,6 +4,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateStatusDto {
   @ApiProperty({
+    description: 'Codigo del parqueadero',
+    example: 'P001',
+  })
+  readonly code: string;
+
+  @ApiProperty({
     description: 'Estado del parqueadero',
     example: 'OPEN',
   })

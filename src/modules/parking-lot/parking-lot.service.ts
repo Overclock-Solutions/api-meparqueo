@@ -55,12 +55,9 @@ export class ParkingLotService extends Service {
     });
   }
 
-  async updateEstatus(
-    code: string,
-    data: UpdateStatusDto,
-  ): Promise<ParkingLot> {
+  async updateEstatus(data: UpdateStatusDto): Promise<ParkingLot> {
     const updated = await this.prisma.parkingLot.update({
-      where: { code },
+      where: { code: data.code },
       data: {
         status: data.status,
         availability: data.availability,
@@ -76,7 +73,7 @@ export class ParkingLotService extends Service {
     });
 
     this.logger.debug(
-      `Parqueadero ${code} actualizado: estado ${data.status} y disponibilidad ${data.availability}`,
+      `Parqueadero ${data.code} actualizado: estado ${data.status} y disponibilidad ${data.availability}`,
     );
 
     return updated;
