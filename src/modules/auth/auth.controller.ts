@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import {
   ApiTags,
   ApiHeader,
@@ -62,7 +62,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
   @ApiResponse({ status: 200, example: RESPONSE_ME_200 })
   @ApiResponse({ status: 401, example: RESPONSE_ME_401 })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Perfil del usuario obtenido correctamente')
   async me(@ActiveUser() user: User) {
     return this.authService.getMe(user.id);

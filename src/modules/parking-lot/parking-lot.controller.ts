@@ -64,7 +64,7 @@ export class ParkingLotController {
   @Get('parking-lot')
   @ApiOperation({ summary: 'Listar parqueaderos' })
   @ApiResponse({ status: 200, example: RESPONSE_FIND_ALL })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Parqueaderos encontrados correctamente')
   findAll() {
     return this.parkingLotService.findAll();
@@ -78,7 +78,7 @@ export class ParkingLotController {
     description: 'Identificador del parqueadero',
     example: 'ab068f85-76fb-46ed-b192-4d9664156011',
   })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Parqueadero encontrado correctamente')
   findOne(@Param('id') id: string) {
     return this.parkingLotService.findOne(id);
