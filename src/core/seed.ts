@@ -19,28 +19,35 @@ async function main() {
 
   console.warn('👤 Creando usuarios...');
 
-  const person = await prisma.person.create({
+  const owner = await prisma.person.create({
     data: {
-      names: 'Andres Felipe',
-      lastNames: 'Suarez Gonzalez',
-      email: 'anfesugo22@gmail.com',
-      phone: '3012345678',
+      names: 'Jhon',
+      lastNames: 'Doe',
+      phone: '3110000000',
+      email: 'jhondoe@miparqueo.com',
     },
   });
-  console.warn(`✅ Persona creada`);
+
+  const personAdmin = await prisma.person.create({
+    data: {
+      names: 'Admin',
+      lastNames: 'Admin',
+      phone: '3110000001',
+      email: 'admin@miparqueo.com',
+    },
+  });
 
   await prisma.user.create({
     data: {
-      email: 'anfesugo22@gmail.com',
+      email: 'jhondoe@miparqueo.com',
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
       role: Role.OWNER,
       globalStatus: GlobalStatus.ACTIVE,
       person: {
-        connect: { id: person.id },
+        connect: { id: owner.id },
       },
     },
   });
-  console.warn(`✅ Usuario propietario creado`);
 
   const admin = await prisma.user.create({
     data: {
@@ -48,9 +55,12 @@ async function main() {
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
       role: Role.ADMIN,
       globalStatus: GlobalStatus.ACTIVE,
+      person: {
+        connect: { id: personAdmin.id },
+      },
     },
   });
-  console.warn(`✅ Usuario admin creado`);
+  console.warn(`✅ Usuarios creados`);
 
   console.warn('🔧 Creando nodos...');
   const node1 = await prisma.node.create({
