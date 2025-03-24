@@ -13,6 +13,7 @@ import {
   CloudStorageModule,
   StorageProviderType,
 } from './modules/cloud-storage/cloud-storage.module';
+import { WebSocketsModule } from './modules/common/socket/websockets.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {
       isGlobal: true,
     }),
     LoggerConfiguredModule,
+    WebSocketsModule,
     AuthModule,
     ParkingLotModule,
     NodeModule,

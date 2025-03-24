@@ -12,6 +12,7 @@ export default (): Config => {
     CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET,
+    CLIENT_URL,
   } = process.env;
   if (!PORT || !DATABASE_URL || !JWT_SECRET) {
     throw new Error('Missing environment variables');
@@ -20,6 +21,7 @@ export default (): Config => {
   return {
     port: Number(PORT),
     databaseUrl: DATABASE_URL,
+    clientUrl: CLIENT_URL,
     jwt: {
       secret: JWT_SECRET,
     },

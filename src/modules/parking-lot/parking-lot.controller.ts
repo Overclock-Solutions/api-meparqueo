@@ -18,7 +18,7 @@ import {
   ApiResponse,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { ParkingLot, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { ParkingLotService } from './parking-lot.service';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
@@ -88,12 +88,9 @@ export class ParkingLotController {
   @Post('parking-lot/status')
   @ApiOperation({ summary: 'Webhook estado parqueadero' })
   @ApiBody({ type: WebhookPayloadDto })
-  async updateStatus(
-    @Body() webhookData: WebhookPayloadDto,
-  ): Promise<ParkingLot> {
+  async updateStatus(@Body() webhookData: WebhookPayloadDto) {
     const { decoded_payload } = webhookData.uplink_message;
-
-    return this.parkingLotService.updateEstatus({
+    this.parkingLotService.updateEstatus({
       code: decoded_payload.code,
       status: decoded_payload.status,
       availability: decoded_payload.availability,

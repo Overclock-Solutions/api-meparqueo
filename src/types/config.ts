@@ -1,6 +1,7 @@
 export type Config = {
   port: number;
   databaseUrl: string;
+  clientUrl: string;
   jwt: {
     secret: string;
   };

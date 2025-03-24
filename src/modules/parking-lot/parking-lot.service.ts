@@ -1,13 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ParkingLot, ParkingLotStatus } from '@prisma/client';
+import {
+  ParkingLot,
+  ParkingLotAvailability,
+  ParkingLotStatus,
+  Role,
+} from '@prisma/client';
 import { Service } from 'src/service';
 import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
+import { GlobalGateway } from '../common/socket/global.gateway';
 
 @Injectable()
 export class ParkingLotService extends Service {
-  constructor() {
+  constructor(private readonly globalGateway: GlobalGateway) {
     super(ParkingLotService.name);
   }
 
@@ -91,9 +97,13 @@ export class ParkingLotService extends Service {
     });
   }
 
-  async updateEstatus(
-    data: UpdateStatusDto,
-  ): Promise<ParkingLot & { nodeIds: string[] }> {
+  async updateEstatus(data: UpdateStatusDto): Promise<{
+    id: string;
+    parkingLotId: string;
+    status: ParkingLotStatus;
+    availability: ParkingLotAvailability;
+    updatedAt: string;
+  }> {
     // Verificar existencia primero
     const existing = await this.prisma.parkingLot.findUnique({
       where: { code: data.code },
@@ -105,8 +115,7 @@ export class ParkingLotService extends Service {
       );
     }
 
-    // Transacción para actualizar y crear histórico
-    const [updated] = await this.prisma.$transaction([
+    await this.prisma.$transaction([
       this.prisma.parkingLot.update({
         where: { code: data.code },
         data: {
@@ -123,11 +132,27 @@ export class ParkingLotService extends Service {
       }),
     ]);
 
+    const newHistory = await this.prisma.parkingLotHistory.create({
+      data: {
+        parkingLotId: existing.id,
+        status: data.status,
+        availability: data.availability,
+      },
+    });
+
+    this.globalGateway.emitToRole(Role.ADMIN, 'updateEstatus', newHistory);
+
     this.logger.debug(
-      `Estado actualizado - Código: ${data.code} | Estado: ${data.status} | Disponibilidad: ${data.availability}`,
+      `Estado actualizado - Codigo: ${data.code} | Estado: ${data.status} | Disponibilidad: ${data.availability}`,
     );
 
-    return this.formatParkingLot(updated.id);
+    return {
+      id: newHistory.id,
+      parkingLotId: newHistory.parkingLotId,
+      status: newHistory.status,
+      availability: newHistory.availability,
+      updatedAt: newHistory.updatedAt.toISOString(),
+    };
   }
 
   async remove(id: string): Promise<ParkingLot & { nodeIds: string[] }> {
@@ -162,10 +187,6 @@ export class ParkingLotService extends Service {
 
     const nearbyParkings = await this.prisma.parkingLot.findMany({
       where: { status: ParkingLotStatus.OPEN },
-      include: {
-        owner: { include: { person: true } },
-        nodes: true,
-      },
     });
 
     return this.formatParkingLots(nearbyParkings);
