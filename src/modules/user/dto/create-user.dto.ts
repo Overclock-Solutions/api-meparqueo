@@ -28,7 +28,7 @@ export class CreateUserDto {
   @IsNotEmpty({
     message: 'El apellido es requerido',
   })
-  lastnames: string;
+  lastNames: string;
 
   @ApiProperty({
     description: 'Email del usuario',

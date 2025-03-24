@@ -18,7 +18,7 @@ export class UserService extends Service {
       const person = await tx.person.create({
         data: {
           names: dto.names,
-          lastNames: dto.lastnames,
+          lastNames: dto.lastNames,
           email: dto.email,
           phone: dto.phone,
         },
@@ -68,7 +68,7 @@ export class UserService extends Service {
         where: { id: user.personId },
         data: {
           names: dto.names,
-          lastNames: dto.lastnames,
+          lastNames: dto.lastNames,
           email: dto.email,
           phone: dto.phone,
         },
