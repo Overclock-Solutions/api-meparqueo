@@ -86,7 +86,7 @@ export class ParkingLotService extends Service {
   async getHistory(parkingLotId: string) {
     return await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: 'asc' },
       take: 10,
     });
   }
@@ -94,21 +94,37 @@ export class ParkingLotService extends Service {
   async updateEstatus(
     data: UpdateStatusDto,
   ): Promise<ParkingLot & { nodeIds: string[] }> {
-    const updated = await this.prisma.parkingLot.update({
+    // Verificar existencia primero
+    const existing = await this.prisma.parkingLot.findUnique({
       where: { code: data.code },
-      data: { status: data.status, availability: data.availability },
     });
 
-    await this.prisma.parkingLotHistory.create({
-      data: {
-        parkingLotId: updated.id,
-        status: data.status ?? updated.status,
-        availability: data.availability ?? updated.availability,
-      },
-    });
+    if (!existing) {
+      throw new NotFoundException(
+        `Parqueadero con código ${data.code} no encontrado`,
+      );
+    }
+
+    // Transacción para actualizar y crear histórico
+    const [updated] = await this.prisma.$transaction([
+      this.prisma.parkingLot.update({
+        where: { code: data.code },
+        data: {
+          status: data.status,
+          availability: data.availability,
+        },
+      }),
+      this.prisma.parkingLotHistory.create({
+        data: {
+          parkingLotId: existing.id,
+          status: data.status,
+          availability: data.availability,
+        },
+      }),
+    ]);
 
     this.logger.debug(
-      `Parqueadero ${data.code} actualizado: estado ${data.status} y disponibilidad ${data.availability}`,
+      `Estado actualizado - Código: ${data.code} | Estado: ${data.status} | Disponibilidad: ${data.availability}`,
     );
 
     return this.formatParkingLot(updated.id);

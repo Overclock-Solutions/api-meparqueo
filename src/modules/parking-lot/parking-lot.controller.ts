@@ -40,6 +40,7 @@ import {
   RESPONSE_FORBIDDEN_403,
   RESPONSE_UNAUTHORIZED_401,
 } from '../common/docs/responses';
+import { WebhookPayloadDto } from './dto/webhook-payload.dto';
 
 @ApiTags('Parqueaderos')
 @ApiHeader({
@@ -84,14 +85,19 @@ export class ParkingLotController {
     return this.parkingLotService.findOne(id);
   }
 
-  // TODO: Implementar webhook
   @Post('parking-lot/status')
   @ApiOperation({ summary: 'Webhook estado parqueadero' })
-  @ApiBody({ type: UpdateStatusDto })
-  async updateStatus(@Body() updateDto: any): Promise<ParkingLot> {
-    console.error(updateDto);
-    return;
-    //return this.parkingLotService.updateEstatus(updateDto);
+  @ApiBody({ type: WebhookPayloadDto })
+  async updateStatus(
+    @Body() webhookData: WebhookPayloadDto,
+  ): Promise<ParkingLot> {
+    const { decoded_payload } = webhookData.uplink_message;
+
+    return this.parkingLotService.updateEstatus({
+      code: decoded_payload.code,
+      status: decoded_payload.status,
+      availability: decoded_payload.availability,
+    });
   }
 
   @Get('parking-lot/find/nearby')
