@@ -22,6 +22,7 @@ import {
   RESPONSE_REGISTER_201,
   RESPONSE_REGISTER_401,
 } from './docs/responses';
+import { ClientDto } from './dto/client.dto';
 
 @ApiTags('Autenticacion')
 @ApiHeader({
@@ -33,7 +34,7 @@ import {
   description: 'No autorizado',
   example: RESPONSE_LOGIN_401,
 })
-@ApiExtraModels(RegisterDto, LoginDto)
+@ApiExtraModels(RegisterDto, LoginDto, ClientDto)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -66,5 +67,13 @@ export class AuthController {
   @ResponseMessage('Perfil del usuario obtenido correctamente')
   async me(@ActiveUser() user: User) {
     return this.authService.getMe(user.id);
+  }
+
+  @Post('client')
+  @ApiOperation({ summary: 'Autenticación simulada del cliente' })
+  @ApiBody({ type: ClientDto })
+  @ResponseMessage('Token generado exitosamente')
+  async clientAuth(@Body() clientDto: ClientDto) {
+    return this.authService.clientAuth(clientDto.clientId);
   }
 }
