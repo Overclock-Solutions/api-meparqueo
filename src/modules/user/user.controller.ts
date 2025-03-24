@@ -34,6 +34,7 @@ import {
   RESPONSE_UNAUTHORIZED_401,
 } from '../common/docs/responses';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiTags('Usuarios (admin) ')
 @ApiHeader({
@@ -108,10 +109,13 @@ export class UserController {
   @Patch('change-password/:id')
   @ApiOperation({ summary: 'Cambiar contraseña' })
   @ApiParam({ name: 'id', description: 'ID del usuario' })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UpdatePasswordDto })
   @ApiResponse({ status: 200, example: RESPONSE_UPDATE_PASSWORD_200 })
   @Auth([Role.ADMIN])
-  async changePassword(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+  async changePassword(
+    @Param('id') id: string,
+    @Body() dto: UpdatePasswordDto,
+  ) {
     return this.userService.changePassword(id, dto);
   }
 }
