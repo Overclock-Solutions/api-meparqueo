@@ -86,7 +86,8 @@ export class ParkingLotService extends Service {
   async getHistory(parkingLotId: string) {
     return await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
-      orderBy: { updatedAt: 'asc' },
+      orderBy: { updatedAt: 'desc' },
+      take: 10,
     });
   }
 

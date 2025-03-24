@@ -4,6 +4,10 @@ import { Service } from 'src/service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GlobalStatus, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserSearchDto } from './dto/create-user-search.dto';
+import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
+import { CreateUserLocationDto } from './dto/create-user-location.dto';
+import { CreateReportDto } from './dto/create-report.dto';
 
 @Injectable()
 export class UserService extends Service {
@@ -112,5 +116,92 @@ export class UserService extends Service {
         person: true,
       },
     });
+  }
+
+  async createReport(dto: CreateReportDto) {
+    return this.prisma.report.create({
+      data: {
+        reason: dto.reason,
+        comment: dto.comment,
+        status: dto.status || 'PENDING',
+        userId: dto.userId,
+        parkingLotId: dto.parkingLotId,
+      },
+    });
+  }
+
+  async createUserLocation(dto: CreateUserLocationDto) {
+    return this.prisma.userLocation.create({
+      data: {
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        userId: dto.userId,
+      },
+    });
+  }
+
+  async createRecentlyParked(dto: CreateRecentlyParkedDto) {
+    return this.prisma.recentlyParkingLot.upsert({
+      where: {
+        userId_parkingLotId: {
+          userId: dto.userId,
+          parkingLotId: dto.parkingLotId,
+        },
+      },
+      update: { viewedAt: new Date() },
+      create: {
+        userId: dto.userId,
+        parkingLotId: dto.parkingLotId,
+      },
+    });
+  }
+
+  async createUserSearch(dto: CreateUserSearchDto) {
+    return this.prisma.userSearch.create({
+      data: {
+        searchTerm: dto.searchTerm,
+        filters: dto.filters,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        userId: dto.userId,
+      },
+    });
+  }
+
+  async getRecentlyParked(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [total, results] = await Promise.all([
+      this.prisma.recentlyParkingLot.count({
+        where: { userId },
+      }),
+      this.prisma.recentlyParkingLot.findMany({
+        where: { userId },
+        include: {
+          parkingLot: true,
+        },
+        orderBy: {
+          viewedAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: results.map((item) => ({
+        id: item.id,
+        viewedAt: item.viewedAt,
+        parkingLot: item.parkingLot,
+      })),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 }

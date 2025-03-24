@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +15,7 @@ import {
   ApiHeader,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -35,8 +37,13 @@ import {
 } from '../common/docs/responses';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { CreateReportDto } from './dto/create-report.dto';
+import { CreateUserLocationDto } from './dto/create-user-location.dto';
+import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
+import { CreateUserSearchDto } from './dto/create-user-search.dto';
+import { PaginatedRecentlyParkedResponseDto } from './dto/recently-parked-response.dto';
 
-@ApiTags('Usuarios (admin) ')
+@ApiTags('Usuarios')
 @ApiHeader({
   name: 'Authorization',
   description: 'Token Bearer',
@@ -117,5 +124,64 @@ export class UserController {
     @Body() dto: UpdatePasswordDto,
   ) {
     return this.userService.changePassword(id, dto);
+  }
+
+  @Post('report')
+  @ApiOperation({ summary: 'Crear un reporte' })
+  @ApiBody({ type: CreateReportDto })
+  @ResponseMessage('Reporte creado exitosamente')
+  @Auth([Role.ADMIN])
+  async createReport(@Body() dto: CreateReportDto) {
+    return this.userService.createReport(dto);
+  }
+
+  @Post('location')
+  @ApiOperation({ summary: 'Registrar ubicación de usuario' })
+  @ApiBody({ type: CreateUserLocationDto })
+  @ResponseMessage('Ubicación registrada exitosamente')
+  @Auth([Role.ADMIN])
+  async createUserLocation(@Body() dto: CreateUserLocationDto) {
+    return this.userService.createUserLocation(dto);
+  }
+
+  @Post('recently-parked')
+  @ApiOperation({ summary: 'Registrar estacionamiento reciente' })
+  @ApiBody({ type: CreateRecentlyParkedDto })
+  @ResponseMessage('Estacionamiento reciente registrado')
+  @Auth([Role.ADMIN])
+  async createRecentlyParked(@Body() dto: CreateRecentlyParkedDto) {
+    return this.userService.createRecentlyParked(dto);
+  }
+
+  @Post('search')
+  @ApiOperation({ summary: 'Registrar búsqueda de usuario' })
+  @ApiBody({ type: CreateUserSearchDto })
+  @ResponseMessage('Búsqueda registrada exitosamente')
+  @Auth([Role.ADMIN])
+  async createUserSearch(@Body() dto: CreateUserSearchDto) {
+    return this.userService.createUserSearch(dto);
+  }
+
+  @Get(':userId/recently-parked')
+  @ApiOperation({ summary: 'Obtener parqueaderos recientes con paginación' })
+  @ApiParam({ name: 'userId', description: 'ID del usuario' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiResponse({
+    status: 200,
+    type: PaginatedRecentlyParkedResponseDto,
+  })
+  @ResponseMessage('Parqueaderos recientes obtenidos')
+  @Auth([Role.ADMIN])
+  async getRecentlyParked(
+    @Param('userId') userId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.userService.getRecentlyParked(
+      userId,
+      Number(page),
+      Number(limit),
+    );
   }
 }
