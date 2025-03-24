@@ -12,32 +12,34 @@ export class UserService extends Service {
   }
 
   async create(dto: CreateUserDto) {
-    const person = await this.prisma.person.create({
-      data: {
-        names: dto.names,
-        lastNames: dto.lastnames,
-        email: dto.email,
-        phone: dto.phone,
-      },
-    });
-
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        password: hashedPassword,
-        role: Role[dto.role],
-        personId: person.id,
-      },
-      include: {
-        person: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const person = await tx.person.create({
+        data: {
+          names: dto.names,
+          lastNames: dto.lastnames,
+          email: dto.email,
+          phone: dto.phone,
+        },
+      });
+
+      return tx.user.create({
+        data: {
+          email: dto.email,
+          password: hashedPassword,
+          role: Role[dto.role],
+          personId: person.id,
+        },
+        include: {
+          person: true,
+        },
+      });
     });
   }
 
   async find() {
-    return await this.prisma.user.findMany({
+    return this.prisma.user.findMany({
       include: {
         person: true,
       },
@@ -45,52 +47,59 @@ export class UserService extends Service {
   }
 
   async findOne(id: string) {
-    return await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: { id },
       include: { person: true },
     });
   }
 
   async updateUser(id: string, dto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
-      where: { id },
-      data: {
-        email: dto.email,
-        role: Role[dto.role],
-      },
-      include: {
-        person: true,
-      },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          email: dto.email,
+          role: Role[dto.role],
+        },
+        include: { person: true },
+      });
 
-    return await this.prisma.person.update({
-      where: { id: user.personId },
-      data: {
-        names: dto.names,
-        lastNames: dto.lastnames,
-        email: dto.email,
-        phone: dto.phone,
-      },
-      include: {
-        user: true,
-      },
+      await tx.person.update({
+        where: { id: user.personId },
+        data: {
+          names: dto.names,
+          lastNames: dto.lastnames,
+          email: dto.email,
+          phone: dto.phone,
+        },
+      });
+
+      return tx.user.findUnique({
+        where: { id },
+        include: { person: true },
+      });
     });
   }
 
   async deleteUser(id: string) {
-    const userDeleted = await this.prisma.user.delete({
-      where: { id },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.delete({
+        where: { id },
+        include: { person: true },
+      });
 
-    await this.prisma.person.delete({
-      where: { id: userDeleted.personId },
+      await tx.person.delete({
+        where: { id: user.person.id },
+      });
+
+      return user;
     });
   }
 
   async changePassword(id: string, dto: UpdateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { id },
       data: {
         password: hashedPassword,
