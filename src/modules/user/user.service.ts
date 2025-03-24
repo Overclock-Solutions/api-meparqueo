@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Service } from 'src/service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Role } from '@prisma/client';
+import { GlobalStatus, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -21,6 +21,7 @@ export class UserService extends Service {
           lastNames: dto.lastNames,
           email: dto.email,
           phone: dto.phone,
+          globalStatus: GlobalStatus[dto.globalStatus],
         },
       });
 
@@ -30,6 +31,7 @@ export class UserService extends Service {
           password: hashedPassword,
           role: Role[dto.role],
           personId: person.id,
+          globalStatus: GlobalStatus[dto.globalStatus],
         },
         include: {
           person: true,
@@ -60,6 +62,7 @@ export class UserService extends Service {
         data: {
           email: dto.email,
           role: Role[dto.role],
+          globalStatus: GlobalStatus[dto.globalStatus],
         },
         include: { person: true },
       });
@@ -71,6 +74,7 @@ export class UserService extends Service {
           lastNames: dto.lastNames,
           email: dto.email,
           phone: dto.phone,
+          globalStatus: GlobalStatus[dto.globalStatus],
         },
       });
 
