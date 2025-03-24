@@ -11,57 +11,91 @@ export class ParkingLotService extends Service {
     super(ParkingLotService.name);
   }
 
-  async create(data: CreateParkingLotDto): Promise<ParkingLot> {
+  private async formatParkingLot(
+    id: string,
+  ): Promise<ParkingLot & { nodeIds: string[] }> {
+    const parkingLot = await this.prisma.parkingLot.findUnique({
+      where: { id },
+      include: {
+        owner: {
+          include: { person: true },
+        },
+        nodes: true,
+      },
+    });
+
+    if (!parkingLot) {
+      throw new NotFoundException(`Parqueadero con id ${id} no encontrado`);
+    }
+
+    return {
+      ...parkingLot,
+      nodeIds: parkingLot.nodes.map((node) => node.id),
+    };
+  }
+
+  private async formatParkingLots(
+    parkingLots: ParkingLot[],
+  ): Promise<(ParkingLot & { nodeIds: string[] })[]> {
+    return Promise.all(parkingLots.map((lot) => this.formatParkingLot(lot.id)));
+  }
+
+  async create(
+    data: CreateParkingLotDto,
+  ): Promise<ParkingLot & { nodeIds: string[] }> {
     const { nodeIds, ...rest } = data;
     const createData: any = {
       ...rest,
       ...(nodeIds ? { nodes: { connect: nodeIds.map((id) => ({ id })) } } : {}),
     };
 
-    return await this.prisma.parkingLot.create({ data: createData });
-  }
-
-  async findAll(): Promise<ParkingLot[]> {
-    return await this.prisma.parkingLot.findMany();
-  }
-
-  async findOne(id: string): Promise<ParkingLot> {
-    const parkingLot = await this.prisma.parkingLot.findUnique({
-      where: { id },
+    const newParkingLot = await this.prisma.parkingLot.create({
+      data: createData,
     });
-    if (!parkingLot) {
-      throw new NotFoundException(`Parqueadero con id ${id} no encontrado`);
-    }
-    return parkingLot;
+    return this.formatParkingLot(newParkingLot.id);
   }
 
-  async update(id: string, data: UpdateParkingLotDto): Promise<ParkingLot> {
+  async findAll(): Promise<(ParkingLot & { nodeIds: string[] })[]> {
+    const parkingLots = await this.prisma.parkingLot.findMany({
+      include: {
+        owner: { include: { person: true } },
+        nodes: true,
+      },
+    });
+    return this.formatParkingLots(parkingLots);
+  }
+
+  async findOne(id: string): Promise<ParkingLot & { nodeIds: string[] }> {
+    return this.formatParkingLot(id);
+  }
+
+  async update(
+    id: string,
+    data: UpdateParkingLotDto,
+  ): Promise<ParkingLot & { nodeIds: string[] }> {
     const { nodeIds, ...rest } = data;
     const updateData: any = {
       ...rest,
       ...(nodeIds ? { nodes: { set: nodeIds.map((id) => ({ id })) } } : {}),
     };
 
-    return await this.prisma.parkingLot.update({
-      where: { id },
-      data: updateData,
-    });
+    await this.prisma.parkingLot.update({ where: { id }, data: updateData });
+    return this.formatParkingLot(id);
   }
 
   async getHistory(parkingLotId: string) {
     return await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: 'asc' },
     });
   }
 
-  async updateEstatus(data: UpdateStatusDto): Promise<ParkingLot> {
+  async updateEstatus(
+    data: UpdateStatusDto,
+  ): Promise<ParkingLot & { nodeIds: string[] }> {
     const updated = await this.prisma.parkingLot.update({
       where: { code: data.code },
-      data: {
-        status: data.status,
-        availability: data.availability,
-      },
+      data: { status: data.status, availability: data.availability },
     });
 
     await this.prisma.parkingLotHistory.create({
@@ -76,28 +110,47 @@ export class ParkingLotService extends Service {
       `Parqueadero ${data.code} actualizado: estado ${data.status} y disponibilidad ${data.availability}`,
     );
 
-    return updated;
+    return this.formatParkingLot(updated.id);
   }
 
-  async remove(id: string): Promise<ParkingLot> {
-    return await this.prisma.parkingLot.delete({
+  async remove(id: string): Promise<ParkingLot & { nodeIds: string[] }> {
+    const parkingLot = await this.prisma.parkingLot.delete({
       where: { id },
+      include: {
+        owner: {
+          include: { person: true },
+        },
+        nodes: true,
+      },
     });
+
+    if (!parkingLot) {
+      throw new NotFoundException(`Parqueadero con id ${id} no encontrado`);
+    }
+
+    return {
+      ...parkingLot,
+      nodeIds: parkingLot.nodes.map((node) => node.id),
+    };
   }
 
-  // TODO: hacer una buena logica
   async findNearby(
     lat: number,
     lng: number,
     radiusKm: number,
-  ): Promise<ParkingLot[]> {
+  ): Promise<(ParkingLot & { nodeIds: string[] })[]> {
     this.logger.debug(
       `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusKm} km`,
     );
+
     const nearbyParkings = await this.prisma.parkingLot.findMany({
       where: { status: ParkingLotStatus.OPEN },
+      include: {
+        owner: { include: { person: true } },
+        nodes: true,
+      },
     });
 
-    return nearbyParkings;
+    return this.formatParkingLots(nearbyParkings);
   }
 }

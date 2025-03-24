@@ -21,13 +21,17 @@ export class CloudinaryProvider implements StorageProvider {
     const base64 = file.buffer.toString('base64');
     const dataURI = `data:${file.mimetype};base64,${base64}`;
 
+    const fileNameWithoutExt = file.originalname.split('.')[0];
+    const timestamp = Date.now();
+    const publicId = `${path}/${timestamp}-${fileNameWithoutExt}`;
+
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload(
         dataURI,
         {
           folder: path,
           resource_type: 'auto',
-          public_id: file.originalname.split('.')[0],
+          public_id: publicId,
         },
         (error, result) => {
           if (error) return reject(error);
@@ -38,6 +42,7 @@ export class CloudinaryProvider implements StorageProvider {
 
     return {
       id: result.public_id,
+      key: result.public_id,
       url: result.secure_url,
       name: file.originalname,
       size: result.bytes,
@@ -82,6 +87,7 @@ export class CloudinaryProvider implements StorageProvider {
 
       return {
         id: result.public_id,
+        key: result.public_id,
         url: result.secure_url,
         name: result.public_id.split('/').pop(),
         size: result.bytes,

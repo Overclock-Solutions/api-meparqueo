@@ -63,21 +63,26 @@ model User {
 }
 
 model ParkingLot {
-  id           String                 @id @default(uuid())
-  code         String                 @unique
-  name         String
-  address      String
-  latitude     Float
-  longitude    Float
-  status       ParkingLotStatus
-  availability ParkingLotAvailability
-  globalStatus GlobalStatus           @default(ACTIVE)
-  ownerId      String?
-  owner        User?                  @relation(fields: [ownerId], references: [id])
-  nodes        Node[]
-  histories    ParkingLotHistory[]
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  id             String                 @id @default(uuid())
+  code           String                 @unique
+  name           String
+  address        String
+  latitude       Float
+  longitude      Float
+  status         ParkingLotStatus
+  availability   ParkingLotAvailability
+  price          Float
+  images         Json[]
+  paymentMethods String[]
+  services       String[]
+  phoneNumber    String
+  globalStatus   GlobalStatus           @default(ACTIVE)
+  ownerId        String?
+  owner          User?                  @relation(fields: [ownerId], references: [id])
+  nodes          Node[]
+  histories      ParkingLotHistory[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 }
 
 model ParkingLotHistory {

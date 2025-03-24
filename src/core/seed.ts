@@ -37,7 +37,7 @@ async function main() {
     },
   });
 
-  await prisma.user.create({
+  const userOwner = await prisma.user.create({
     data: {
       email: 'jhondoe@miparqueo.com',
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
@@ -49,7 +49,7 @@ async function main() {
     },
   });
 
-  const admin = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: 'admin@miparqueo.com',
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
@@ -81,10 +81,20 @@ async function main() {
       latitude: 8.7554462,
       longitude: -75.8889753,
       status: ParkingLotStatus.OPEN,
+      price: 2400,
+      phoneNumber: '3116347710',
+      images: [
+        {
+          key: '01',
+          url: 'https://res.cloudinary.com/dxuauzyp9/image/upload/v1742793169/meparqueo/paisaje.jpg',
+        },
+      ],
+      paymentMethods: ['CASH', 'TRANSFER'],
+      services: ['SECURITY', 'CAR_WASH'],
       availability: ParkingLotAvailability.MORE_THAN_FIVE,
       globalStatus: GlobalStatus.ACTIVE,
       owner: {
-        connect: { id: admin.id },
+        connect: { id: userOwner.id },
       },
       nodes: {
         connect: { id: node1.id },
