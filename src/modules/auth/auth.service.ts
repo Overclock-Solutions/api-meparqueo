@@ -41,7 +41,12 @@ export class AuthService extends Service {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      globalStatus: user.globalStatus,
+    };
 
     return {
       token: this.jwtService.sign(payload),
