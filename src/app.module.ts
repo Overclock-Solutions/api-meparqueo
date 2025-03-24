@@ -9,11 +9,19 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ParkingLotModule } from './modules/parking-lot/parking-lot.module';
 import { NodeModule } from './modules/node/node.module';
 import { UserModule } from './modules/user/user.module';
+import {
+  CloudStorageModule,
+  StorageProviderType,
+} from './modules/cloud-storage/cloud-storage.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configLoader],
+      isGlobal: true,
+    }),
+    CloudStorageModule.register({
+      defaultProvider: StorageProviderType.CLOUDINARY,
       isGlobal: true,
     }),
     LoggerConfiguredModule,

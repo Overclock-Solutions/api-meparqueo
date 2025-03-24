@@ -1,7 +1,18 @@
 import { Config } from 'src/types/config';
 
 export default (): Config => {
-  const { PORT, DATABASE_URL, JWT_SECRET } = process.env;
+  const {
+    PORT,
+    DATABASE_URL,
+    JWT_SECRET,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_REGION,
+    AWS_S3_BUCKET,
+    CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET,
+  } = process.env;
   if (!PORT || !DATABASE_URL || !JWT_SECRET) {
     throw new Error('Missing environment variables');
   }
@@ -11,6 +22,19 @@ export default (): Config => {
     databaseUrl: DATABASE_URL,
     jwt: {
       secret: JWT_SECRET,
+    },
+    aws: {
+      s3: {
+        bucket: AWS_S3_BUCKET,
+      },
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      accessKeySecret: AWS_SECRET_ACCESS_KEY,
+      region: AWS_REGION,
+    },
+    cloudinary: {
+      apiKey: CLOUDINARY_API_KEY,
+      apiSecret: CLOUDINARY_API_SECRET,
+      cloudName: CLOUDINARY_CLOUD_NAME,
     },
   };
 };
