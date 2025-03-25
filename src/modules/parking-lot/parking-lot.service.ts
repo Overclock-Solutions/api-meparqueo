@@ -176,19 +176,90 @@ export class ParkingLotService extends Service {
     };
   }
 
+  private degreesToRadians(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  private getDistanceKm(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = this.degreesToRadians(lat2 - lat1);
+    const dLng = this.degreesToRadians(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(this.degreesToRadians(lat1)) *
+        Math.cos(this.degreesToRadians(lat2)) *
+        Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
   async findNearby(
     lat: number,
     lng: number,
     radiusKm: number,
-  ): Promise<(ParkingLot & { nodeIds: string[] })[]> {
-    this.logger.debug(
+  ): Promise<(ParkingLot & { imageUrls: string[]; distanceKm: number })[]> {
+    this.logger?.debug(
       `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusKm} km`,
     );
 
-    const nearbyParkings = await this.prisma.parkingLot.findMany({
+    // Se obtienen todos los parqueaderos abiertos
+    const allParkings = await this.prisma.parkingLot.findMany({
       where: { status: ParkingLotStatus.OPEN },
     });
 
-    return this.formatParkingLots(nearbyParkings);
+    // Filtrar parqueaderos dentro del radio definido
+    const nearbyParkings = allParkings.filter((parking) => {
+      const distance = this.getDistanceKm(
+        lat,
+        lng,
+        parking.latitude,
+        parking.longitude,
+      );
+      return distance <= radiusKm;
+    });
+
+    // Formatear cada parqueadero con sus URLs de imagen y la distancia calculada
+    const formattedParkings = nearbyParkings.map((parking) => {
+      const distanceKm = this.getDistanceKm(
+        lat,
+        lng,
+        parking.latitude,
+        parking.longitude,
+      );
+      return {
+        ...parking,
+        imageUrls: (parking.images as { url: string }[]).map(
+          (image) => image.url,
+        ),
+        distanceKm: Math.round(distanceKm * 10) / 10,
+      };
+    });
+
+    // Definir el orden de disponibilidad:
+    // "MORE_THAN_FIVE" es la mejor disponibilidad, seguido de "LESS_THAN_FIVE" y finalmente "NO_AVAILABILITY"
+    const availabilityOrder: { [key in ParkingLotAvailability]: number } = {
+      MORE_THAN_FIVE: 0,
+      LESS_THAN_FIVE: 1,
+      NO_AVAILABILITY: 2,
+    };
+
+    // Ordenar: primero por disponibilidad, luego por precio (ascendente) y finalmente por distancia (más cercano primero)
+    formattedParkings.sort((a, b) => {
+      const availComp =
+        availabilityOrder[a.availability] - availabilityOrder[b.availability];
+      if (availComp !== 0) return availComp;
+
+      const priceComp = a.price - b.price;
+      if (priceComp !== 0) return priceComp;
+
+      return a.distanceKm - b.distanceKm;
+    });
+
+    return formattedParkings;
   }
 }

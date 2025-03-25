@@ -129,7 +129,7 @@ export const REPONSE_FIND_ALL_USER_200 = {
     },
     {
       id: 'a0f42a5b-cfcb-4b10-b3a4-73aa306b8066',
-      email: 'admin@miparqueo.com',
+      email: 'admin@meparqueo.com',
       password: '$2b$10$83WHVDqFmdfcR0f3MyhfruXJusUJcHjGNGy0hlbtJrwnAi1yCmzwK',
       personId: null,
       role: 'ADMIN',
