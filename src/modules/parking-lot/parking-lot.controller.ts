@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
@@ -19,7 +18,7 @@ import {
   ApiResponse,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { ParkingLot, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { ParkingLotService } from './parking-lot.service';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
@@ -30,7 +29,6 @@ import {
   RESPONSE_FIND_NEARBY,
   RESPONSE_FIND_ONE,
   RESPONSE_GET_HISTORY,
-  RESPONSE_UPDATE_STATUS,
   RESPONSE_CONFLICT_409,
   RESPONSE_CREATE,
   RESPONSE_UPDATE,
@@ -42,6 +40,7 @@ import {
   RESPONSE_FORBIDDEN_403,
   RESPONSE_UNAUTHORIZED_401,
 } from '../common/docs/responses';
+import { WebhookPayloadDto } from './dto/webhook-payload.dto';
 
 @ApiTags('Parqueaderos')
 @ApiHeader({
@@ -66,7 +65,7 @@ export class ParkingLotController {
   @Get('parking-lot')
   @ApiOperation({ summary: 'Listar parqueaderos' })
   @ApiResponse({ status: 200, example: RESPONSE_FIND_ALL })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Parqueaderos encontrados correctamente')
   findAll() {
     return this.parkingLotService.findAll();
@@ -80,33 +79,28 @@ export class ParkingLotController {
     description: 'Identificador del parqueadero',
     example: 'ab068f85-76fb-46ed-b192-4d9664156011',
   })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Parqueadero encontrado correctamente')
   findOne(@Param('id') id: string) {
     return this.parkingLotService.findOne(id);
   }
 
-  @Patch('parking-lot/:code/status')
-  @ApiOperation({ summary: 'Actualizar estado del parqueadero' })
-  @ApiParam({
-    name: 'code',
-    description: 'Código del parqueadero',
-    example: 'P001',
-  })
-  @ApiBody({ type: UpdateStatusDto })
-  @ApiResponse({ status: 200, example: RESPONSE_UPDATE_STATUS })
-  @ResponseMessage('Estado del parqueadero actualizado correctamente')
-  async updateStatus(
-    @Param('code') code: string,
-    @Body() updateDto: UpdateStatusDto,
-  ): Promise<ParkingLot> {
-    return this.parkingLotService.updateEstatus(code, updateDto);
+  @Post('parking-lot/status')
+  @ApiOperation({ summary: 'Webhook estado parqueadero' })
+  @ApiBody({ type: WebhookPayloadDto })
+  async updateStatus(@Body() webhookData: WebhookPayloadDto) {
+    const { decoded_payload } = webhookData.uplink_message;
+    this.parkingLotService.updateEstatus({
+      code: decoded_payload.code,
+      status: decoded_payload.status,
+      availability: decoded_payload.availability,
+    });
   }
 
   @Get('parking-lot/find/nearby')
   @ApiOperation({ summary: 'Buscar parqueaderos cercanos' })
   @ApiResponse({ status: 200, example: RESPONSE_FIND_NEARBY })
-  @Auth([Role.USER, Role.OWNER, Role.ADMIN])
+  @Auth([Role.USER])
   @ResponseMessage('Parqueaderos cercanos encontrados correctamente')
   async findNearby(@Query(ValidationPipe) query: NearbyParamsDto) {
     return this.parkingLotService.findNearby(

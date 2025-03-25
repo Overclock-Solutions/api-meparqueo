@@ -41,7 +41,12 @@ export class AuthService extends Service {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      globalStatus: user.globalStatus,
+    };
 
     return {
       token: this.jwtService.sign(payload),
@@ -55,4 +60,39 @@ export class AuthService extends Service {
       include: { person: true },
     });
   }
+
+  async clientAuth(clientId: string) {
+    const clientEmail = `${clientId}@meparqueo.com`;
+    let user = await this.prisma.user.findUnique({
+      where: { email: clientEmail },
+    });
+
+    if (!user) {
+      const randomPassword = await this.randomPass();
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+      user = await this.prisma.user.create({
+        data: {
+          email: clientEmail,
+          password: hashedPassword,
+          role: Role.USER,
+        },
+      });
+    }
+
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      globalStatus: user.globalStatus,
+    };
+
+    return {
+      token: this.jwtService.sign(payload),
+      user,
+    };
+  }
+
+  randomPass = async (): Promise<string> => {
+    return Math.random().toString(36).slice(-8);
+  };
 }

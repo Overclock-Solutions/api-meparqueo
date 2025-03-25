@@ -37,47 +37,70 @@ enum Version {
   V2
 }
 
+enum ReportReason {
+  INCORRECT_INFO
+  SAFETY_ISSUE
+  BAD_SERVICE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+}
+
 model Person {
   id           String       @id @default(uuid())
   names        String
   lastNames    String
-  email        String       @unique
+  email        String?
   phone        String
-  cretedAt     DateTime     @default(now())
+  createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   user         User?
   globalStatus GlobalStatus @default(ACTIVE)
 }
 
 model User {
-  id           String       @id @default(uuid())
-  email        String       @unique
-  password     String
-  person       Person?      @relation(fields: [personId], references: [id])
-  personId     String?      @unique
-  role         Role         @default(USER)
-  globalStatus GlobalStatus @default(ACTIVE)
-  parkingLots  ParkingLot[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  password           String
+  person             Person?              @relation(fields: [personId], references: [id])
+  personId           String?              @unique
+  role               Role                 @default(USER)
+  globalStatus       GlobalStatus         @default(ACTIVE)
+  parkingLots        ParkingLot[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Report             Report[]
+  UserLocation       UserLocation[]
+  RecentlyParkingLot RecentlyParkingLot[]
+  UserSearch         UserSearch[]
 }
 
 model ParkingLot {
-  id           String                 @id @default(uuid())
-  code         String                 @unique
-  name         String
-  address      String
-  latitude     Float
-  longitude    Float
-  status       ParkingLotStatus
-  availability ParkingLotAvailability
-  globalStatus GlobalStatus           @default(ACTIVE)
-  ownerId      String?
-  owner        User?                  @relation(fields: [ownerId], references: [id])
-  nodes        Node[]
-  histories    ParkingLotHistory[]
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  id                 String                 @id @default(uuid())
+  code               String                 @unique
+  name               String
+  address            String
+  latitude           Float
+  longitude          Float
+  status             ParkingLotStatus
+  availability       ParkingLotAvailability
+  price              Float
+  images             Json[]
+  paymentMethods     String[]
+  services           String[]
+  phoneNumber        String
+  globalStatus       GlobalStatus           @default(ACTIVE)
+  ownerId            String?
+  owner              User?                  @relation(fields: [ownerId], references: [id])
+  nodes              Node[]
+  histories          ParkingLotHistory[]
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  Report             Report[]
+  RecentlyParkingLot RecentlyParkingLot[]
 }
 
 model ParkingLotHistory {
@@ -99,4 +122,53 @@ model Node {
   parkingLot   ParkingLot?  @relation(fields: [parkingLotId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+}
+
+model Report {
+  id           String       @id @default(uuid())
+  reason       ReportReason
+  comment      String
+  status       ReportStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  parkingLotId String
+  parkingLot   ParkingLot   @relation(fields: [parkingLotId], references: [id])
+}
+
+model UserLocation {
+  id        String   @id @default(uuid())
+  latitude  Float
+  longitude Float
+  timestamp DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model RecentlyParkingLot {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  parkingLotId String
+  parkingLot   ParkingLot @relation(fields: [parkingLotId], references: [id])
+  viewedAt     DateTime   @default(now())
+
+  @@unique([userId, parkingLotId])
+}
+
+model UserSearch {
+  id         String   @id @default(uuid())
+  searchTerm String // Término de búsqueda utilizado
+  filters    Json? // Filtros aplicados (ej: {priceRange: [0,10], services: ["CAR_WASH"]})
+  latitude   Float? // Ubicación desde donde se realizó la búsqueda
+  longitude  Float? // Ubicación desde donde se realizó la búsqueda
+  timestamp  DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([timestamp])
 }

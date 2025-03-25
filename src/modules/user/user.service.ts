@@ -2,8 +2,12 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Service } from 'src/service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Role } from '@prisma/client';
+import { GlobalStatus, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserSearchDto } from './dto/create-user-search.dto';
+import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
+import { CreateUserLocationDto } from './dto/create-user-location.dto';
+import { CreateReportDto } from './dto/create-report.dto';
 
 @Injectable()
 export class UserService extends Service {
@@ -12,32 +16,36 @@ export class UserService extends Service {
   }
 
   async create(dto: CreateUserDto) {
-    const person = await this.prisma.person.create({
-      data: {
-        names: dto.names,
-        lastNames: dto.lastnames,
-        email: dto.email,
-        phone: dto.phone,
-      },
-    });
-
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        password: hashedPassword,
-        role: Role[dto.role],
-        personId: person.id,
-      },
-      include: {
-        person: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const person = await tx.person.create({
+        data: {
+          names: dto.names,
+          lastNames: dto.lastNames,
+          email: dto.email,
+          phone: dto.phone,
+          globalStatus: GlobalStatus[dto.globalStatus],
+        },
+      });
+
+      return tx.user.create({
+        data: {
+          email: dto.email,
+          password: hashedPassword,
+          role: Role[dto.role],
+          personId: person.id,
+          globalStatus: GlobalStatus[dto.globalStatus],
+        },
+        include: {
+          person: true,
+        },
+      });
     });
   }
 
   async find() {
-    return await this.prisma.user.findMany({
+    return this.prisma.user.findMany({
       include: {
         person: true,
       },
@@ -45,52 +53,61 @@ export class UserService extends Service {
   }
 
   async findOne(id: string) {
-    return await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: { id },
       include: { person: true },
     });
   }
 
   async updateUser(id: string, dto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
-      where: { id },
-      data: {
-        email: dto.email,
-        role: Role[dto.role],
-      },
-      include: {
-        person: true,
-      },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          email: dto.email,
+          role: Role[dto.role],
+          globalStatus: GlobalStatus[dto.globalStatus],
+        },
+        include: { person: true },
+      });
 
-    return await this.prisma.person.update({
-      where: { id: user.personId },
-      data: {
-        names: dto.names,
-        lastNames: dto.lastnames,
-        email: dto.email,
-        phone: dto.phone,
-      },
-      include: {
-        user: true,
-      },
+      await tx.person.update({
+        where: { id: user.personId },
+        data: {
+          names: dto.names,
+          lastNames: dto.lastNames,
+          email: dto.email,
+          phone: dto.phone,
+          globalStatus: GlobalStatus[dto.globalStatus],
+        },
+      });
+
+      return tx.user.findUnique({
+        where: { id },
+        include: { person: true },
+      });
     });
   }
 
   async deleteUser(id: string) {
-    const userDeleted = await this.prisma.user.delete({
-      where: { id },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.delete({
+        where: { id },
+        include: { person: true },
+      });
 
-    await this.prisma.person.delete({
-      where: { id: userDeleted.personId },
+      await tx.person.delete({
+        where: { id: user.person.id },
+      });
+
+      return user;
     });
   }
 
   async changePassword(id: string, dto: UpdateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { id },
       data: {
         password: hashedPassword,
@@ -99,5 +116,92 @@ export class UserService extends Service {
         person: true,
       },
     });
+  }
+
+  async createReport(dto: CreateReportDto) {
+    return this.prisma.report.create({
+      data: {
+        reason: dto.reason,
+        comment: dto.comment,
+        status: dto.status || 'PENDING',
+        userId: dto.userId,
+        parkingLotId: dto.parkingLotId,
+      },
+    });
+  }
+
+  async createUserLocation(dto: CreateUserLocationDto) {
+    return this.prisma.userLocation.create({
+      data: {
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        userId: dto.userId,
+      },
+    });
+  }
+
+  async createRecentlyParked(dto: CreateRecentlyParkedDto) {
+    return this.prisma.recentlyParkingLot.upsert({
+      where: {
+        userId_parkingLotId: {
+          userId: dto.userId,
+          parkingLotId: dto.parkingLotId,
+        },
+      },
+      update: { viewedAt: new Date() },
+      create: {
+        userId: dto.userId,
+        parkingLotId: dto.parkingLotId,
+      },
+    });
+  }
+
+  async createUserSearch(dto: CreateUserSearchDto) {
+    return this.prisma.userSearch.create({
+      data: {
+        searchTerm: dto.searchTerm,
+        filters: dto.filters,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        userId: dto.userId,
+      },
+    });
+  }
+
+  async getRecentlyParked(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [total, results] = await Promise.all([
+      this.prisma.recentlyParkingLot.count({
+        where: { userId },
+      }),
+      this.prisma.recentlyParkingLot.findMany({
+        where: { userId },
+        include: {
+          parkingLot: true,
+        },
+        orderBy: {
+          viewedAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: results.map((item) => ({
+        id: item.id,
+        viewedAt: item.viewedAt,
+        parkingLot: item.parkingLot,
+      })),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 }

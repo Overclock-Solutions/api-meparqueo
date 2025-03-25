@@ -4,8 +4,10 @@ import {
   MinLength,
   IsNotEmpty,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { GlobalStatus } from '@prisma/client';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -28,7 +30,7 @@ export class CreateUserDto {
   @IsNotEmpty({
     message: 'El apellido es requerido',
   })
-  lastnames: string;
+  lastNames: string;
 
   @ApiProperty({
     description: 'Email del usuario',
@@ -72,4 +74,13 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   role: string;
+
+  @ApiProperty({
+    description: 'Estado global del nodo',
+    example: 'ACTIVE',
+    required: false,
+  })
+  @IsEnum(GlobalStatus)
+  @IsOptional()
+  readonly globalStatus?: GlobalStatus;
 }
