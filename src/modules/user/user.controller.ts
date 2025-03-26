@@ -140,9 +140,12 @@ export class UserController {
   @ApiOperation({ summary: 'Registrar ubicación de usuario' })
   @ApiBody({ type: CreateUserLocationDto })
   @ResponseMessage('Ubicación registrada exitosamente')
-  @Auth([Role.ADMIN])
-  async createUserLocation(@Body() dto: CreateUserLocationDto) {
-    return this.userService.createUserLocation(dto);
+  @Auth([Role.USER])
+  async createUserLocation(
+    @Body() dto: CreateUserLocationDto,
+    @ActiveUser() user: User,
+  ) {
+    return this.userService.createUserLocation(dto, user);
   }
 
   @Post('recently-parked')
@@ -151,8 +154,8 @@ export class UserController {
   @ResponseMessage('Estacionamiento reciente registrado')
   @Auth([Role.USER])
   async createRecentlyParked(
-    @ActiveUser() user: User,
     @Body() dto: CreateRecentlyParkedDto,
+    @ActiveUser() user: User,
   ) {
     return this.userService.createRecentlyParked(dto, user);
   }
@@ -161,9 +164,12 @@ export class UserController {
   @ApiOperation({ summary: 'Registrar búsqueda de usuario' })
   @ApiBody({ type: CreateUserSearchDto })
   @ResponseMessage('Búsqueda registrada exitosamente')
-  @Auth([Role.ADMIN])
-  async createUserSearch(@Body() dto: CreateUserSearchDto) {
-    return this.userService.createUserSearch(dto);
+  @Auth([Role.USER])
+  async createUserSearch(
+    @Body() dto: CreateUserSearchDto,
+    @ActiveUser() user: User,
+  ) {
+    return this.userService.createUserSearch(dto, user);
   }
 
   @Get(':userId/recently-parked')

@@ -130,26 +130,19 @@ export class UserService extends Service {
     });
   }
 
-  async createUserLocation(dto: CreateUserLocationDto) {
+  async createUserLocation(dto: CreateUserLocationDto, user: User) {
     return this.prisma.userLocation.create({
       data: {
         latitude: dto.latitude,
         longitude: dto.longitude,
-        userId: dto.userId,
+        userId: user.id,
       },
     });
   }
 
   async createRecentlyParked(dto: CreateRecentlyParkedDto, user: User) {
-    return this.prisma.recentlyParkingLot.upsert({
-      where: {
-        userId_parkingLotId: {
-          userId: user.id,
-          parkingLotId: dto.parkingLotId,
-        },
-      },
-      update: { viewedAt: new Date() },
-      create: {
+    return this.prisma.recentlyParkingLot.create({
+      data: {
         userId: user.id,
         parkingLotId: dto.parkingLotId,
         distanceKm: dto.distanceKm,
@@ -158,18 +151,21 @@ export class UserService extends Service {
           longitude: dto.destinationLocation.longitude,
           latitude: dto.destinationLocation.latitude,
         },
+        viewedAt: new Date(),
       },
     });
   }
 
-  async createUserSearch(dto: CreateUserSearchDto) {
+  async createUserSearch(dto: CreateUserSearchDto, user: User) {
     return this.prisma.userSearch.create({
       data: {
-        searchTerm: dto.searchTerm,
         filters: dto.filters,
-        latitude: dto.latitude,
-        longitude: dto.longitude,
-        userId: dto.userId,
+        destinationLocation: {
+          latitude: dto.destinationLocation.latitude,
+          longitude: dto.destinationLocation.longitude,
+          searchTerm: dto.destinationLocation.searchTerm,
+        },
+        userId: user.id,
       },
     });
   }

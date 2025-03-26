@@ -6,23 +6,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
-class DestinationLocation {
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  latitude: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  longitude: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  searchTerm: string;
-}
+import { DestinationLocation } from './destination-location';
 
 export class CreateRecentlyParkedDto {
   @ApiProperty()
