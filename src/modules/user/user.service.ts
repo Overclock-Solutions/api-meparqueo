@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Service } from 'src/service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GlobalStatus, Role } from '@prisma/client';
+import { GlobalStatus, Role, User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserSearchDto } from './dto/create-user-search.dto';
 import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
@@ -140,18 +140,24 @@ export class UserService extends Service {
     });
   }
 
-  async createRecentlyParked(dto: CreateRecentlyParkedDto) {
+  async createRecentlyParked(dto: CreateRecentlyParkedDto, user: User) {
     return this.prisma.recentlyParkingLot.upsert({
       where: {
         userId_parkingLotId: {
-          userId: dto.userId,
+          userId: user.id,
           parkingLotId: dto.parkingLotId,
         },
       },
       update: { viewedAt: new Date() },
       create: {
-        userId: dto.userId,
+        userId: user.id,
         parkingLotId: dto.parkingLotId,
+        distanceKm: dto.distanceKm,
+        destinationLocation: {
+          searchTerm: dto.destinationLocation.searchTerm,
+          longitude: dto.destinationLocation.longitude,
+          latitude: dto.destinationLocation.latitude,
+        },
       },
     });
   }

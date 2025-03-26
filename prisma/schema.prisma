@@ -149,12 +149,14 @@ model UserLocation {
 }
 
 model RecentlyParkingLot {
-  id           String     @id @default(uuid())
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  parkingLotId String
-  parkingLot   ParkingLot @relation(fields: [parkingLotId], references: [id])
-  viewedAt     DateTime   @default(now())
+  id                  String     @id @default(uuid())
+  userId              String
+  destinationLocation Json
+  distanceKm          Float?
+  user                User       @relation(fields: [userId], references: [id])
+  parkingLotId        String
+  parkingLot          ParkingLot @relation(fields: [parkingLotId], references: [id])
+  viewedAt            DateTime   @default(now())
 
   @@unique([userId, parkingLotId])
 }
