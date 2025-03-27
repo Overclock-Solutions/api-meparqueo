@@ -79,27 +79,6 @@ export const RESPONSE_GET_HISTORY = {
   ],
 };
 
-export const RESPONSE_UPDATE_STATUS = {
-  statusCode: 200,
-  timestamp: '2025-02-26T19:49:57.174Z',
-  success: true,
-  message: 'Estado del parqueadero actualizado correctamente',
-  data: {
-    id: '2f33795b-c470-4657-9ba9-cec309a8f7ea',
-    code: 'P001',
-    name: 'Parqueadero',
-    address: 'Calle 27 &, Av. 1, Montería',
-    latitude: 8.7554462,
-    longitude: -75.8889753,
-    status: 'OPEN',
-    availability: 'MORE_THAN_FIVE',
-    globalStatus: 'ACTIVE',
-    createdAt: '2025-02-26T19:33:47.899Z',
-    updatedAt: '2025-02-26T19:49:57.116Z',
-    ownerId: 'ba94c1a1-c2d2-47de-91cb-1ebfcf914647',
-  },
-};
-
 export const RESPONSE_FIND_NEARBY = {
   statusCode: 200,
   timestamp: '2025-02-27T04:52:36.689Z',

@@ -114,4 +114,60 @@ export class CreateParkingLotDto {
   @IsString({ each: true })
   @IsOptional()
   readonly nodeIds?: string[];
+
+  @ApiProperty({
+    description: 'Precio del parqueadero',
+    type: Number,
+    example: 2400,
+  })
+  @IsNumber()
+  @Type(() => Number)
+  @IsNotEmpty({
+    message: 'El precio es obligatorio',
+  })
+  readonly price: number;
+
+  @ApiProperty({
+    description: 'Número de teléfono del parqueadero',
+    type: String,
+    example: '3116347710',
+  })
+  @IsString()
+  @IsNotEmpty({
+    message: 'El número de teléfono es obligatorio',
+  })
+  readonly phoneNumber: string;
+
+  @ApiProperty({
+    description: 'Imágenes del parqueadero',
+    example: [
+      {
+        key: '01',
+        url: 'https://res.cloudinary.com/dxuauzyp9/image/upload/v1742793169/meparqueo/paisaje.jpg',
+      },
+    ],
+    isArray: true,
+  })
+  @IsOptional()
+  readonly images?: { key: string; url: string }[];
+
+  @ApiProperty({
+    description: 'Métodos de pago aceptados',
+    type: [String],
+    example: ['nequi', 'daviplata'],
+    isArray: true,
+  })
+  @IsString({ each: true })
+  @IsOptional()
+  readonly paymentMethods?: string[];
+
+  @ApiProperty({
+    description: 'Servicios ofrecidos en el parqueadero',
+    type: [String],
+    example: ['lavado', 'bar'],
+    isArray: true,
+  })
+  @IsString({ each: true })
+  @IsOptional()
+  readonly services?: string[];
 }

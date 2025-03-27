@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import {
   ApiTags,
   ApiHeader,
@@ -22,6 +22,7 @@ import {
   RESPONSE_REGISTER_201,
   RESPONSE_REGISTER_401,
 } from './docs/responses';
+import { ClientDto } from './dto/client.dto';
 
 @ApiTags('Autenticacion')
 @ApiHeader({
@@ -33,7 +34,7 @@ import {
   description: 'No autorizado',
   example: RESPONSE_LOGIN_401,
 })
-@ApiExtraModels(RegisterDto, LoginDto)
+@ApiExtraModels(RegisterDto, LoginDto, ClientDto)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -62,9 +63,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
   @ApiResponse({ status: 200, example: RESPONSE_ME_200 })
   @ApiResponse({ status: 401, example: RESPONSE_ME_401 })
-  @Auth([Role.ADMIN, Role.OWNER, Role.USER])
+  @Auth()
   @ResponseMessage('Perfil del usuario obtenido correctamente')
   async me(@ActiveUser() user: User) {
     return this.authService.getMe(user.id);
+  }
+
+  @Post('client')
+  @ApiOperation({ summary: 'Autenticación simulada del cliente' })
+  @ApiBody({ type: ClientDto })
+  @ResponseMessage('Token generado exitosamente')
+  async clientAuth(@Body() clientDto: ClientDto) {
+    return this.authService.clientAuth(clientDto.clientId);
   }
 }

@@ -1,19 +1,34 @@
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { ParkingLotAvailability, ParkingLotStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateStatusDto {
   @ApiProperty({
-    description: 'Estado del parqueadero',
-    example: 'OPEN',
+    description: 'Código único del parqueadero',
+    example: 'P001',
+    required: true,
   })
-  @IsEnum(ParkingLotStatus)
-  readonly status: ParkingLotStatus;
+  @IsString()
+  @IsNotEmpty()
+  code: string;
 
   @ApiProperty({
-    description: 'Disponiblidad del parqueadero',
-    example: 'MORE_THAN_FIVE',
+    description: 'Estado operativo del parqueadero',
+    enum: ParkingLotStatus,
+    example: ParkingLotStatus.OPEN,
+    required: true,
+  })
+  @IsEnum(ParkingLotStatus)
+  @IsNotEmpty()
+  status: ParkingLotStatus;
+
+  @ApiProperty({
+    description: 'Nivel de disponibilidad de espacios',
+    enum: ParkingLotAvailability,
+    example: ParkingLotAvailability.MORE_THAN_FIVE,
+    required: true,
   })
   @IsEnum(ParkingLotAvailability)
-  readonly availability: ParkingLotAvailability;
+  @IsNotEmpty()
+  availability: ParkingLotAvailability;
 }

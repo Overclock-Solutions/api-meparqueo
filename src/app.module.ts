@@ -8,6 +8,12 @@ import { ResponseInterceptor } from './lib/ResponseInterceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { ParkingLotModule } from './modules/parking-lot/parking-lot.module';
 import { NodeModule } from './modules/node/node.module';
+import { UserModule } from './modules/user/user.module';
+import {
+  CloudStorageModule,
+  StorageProviderType,
+} from './modules/cloud-storage/cloud-storage.module';
+import { WebSocketsModule } from './modules/common/socket/websockets.module';
 
 @Module({
   imports: [
@@ -15,10 +21,16 @@ import { NodeModule } from './modules/node/node.module';
       load: [configLoader],
       isGlobal: true,
     }),
+    CloudStorageModule.register({
+      defaultProvider: StorageProviderType.CLOUDINARY,
+      isGlobal: true,
+    }),
     LoggerConfiguredModule,
+    WebSocketsModule,
     AuthModule,
     ParkingLotModule,
     NodeModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, ResponseInterceptor],
