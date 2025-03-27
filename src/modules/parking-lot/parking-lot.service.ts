@@ -141,6 +141,7 @@ export class ParkingLotService extends Service {
     });
 
     this.globalGateway.emitToRole(Role.ADMIN, 'updateEstatus', newHistory);
+    this.globalGateway.emitToRole(Role.USER, 'parkingUpdateStatus', newHistory);
 
     this.logger.debug(
       `Estado actualizado - Codigo: ${data.code} | Estado: ${data.status} | Disponibilidad: ${data.availability}`,

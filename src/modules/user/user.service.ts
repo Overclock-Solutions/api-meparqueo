@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Service } from 'src/service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GlobalStatus, Role } from '@prisma/client';
+import { GlobalStatus, Role, User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserSearchDto } from './dto/create-user-search.dto';
 import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
@@ -130,40 +130,42 @@ export class UserService extends Service {
     });
   }
 
-  async createUserLocation(dto: CreateUserLocationDto) {
+  async createUserLocation(dto: CreateUserLocationDto, user: User) {
     return this.prisma.userLocation.create({
       data: {
         latitude: dto.latitude,
         longitude: dto.longitude,
-        userId: dto.userId,
+        userId: user.id,
       },
     });
   }
 
-  async createRecentlyParked(dto: CreateRecentlyParkedDto) {
-    return this.prisma.recentlyParkingLot.upsert({
-      where: {
-        userId_parkingLotId: {
-          userId: dto.userId,
-          parkingLotId: dto.parkingLotId,
-        },
-      },
-      update: { viewedAt: new Date() },
-      create: {
-        userId: dto.userId,
+  async createRecentlyParked(dto: CreateRecentlyParkedDto, user: User) {
+    return this.prisma.recentlyParkingLot.create({
+      data: {
+        userId: user.id,
         parkingLotId: dto.parkingLotId,
+        distanceKm: dto.distanceKm,
+        destinationLocation: {
+          searchTerm: dto.destinationLocation.searchTerm,
+          longitude: dto.destinationLocation.longitude,
+          latitude: dto.destinationLocation.latitude,
+        },
+        viewedAt: new Date(),
       },
     });
   }
 
-  async createUserSearch(dto: CreateUserSearchDto) {
+  async createUserSearch(dto: CreateUserSearchDto, user: User) {
     return this.prisma.userSearch.create({
       data: {
-        searchTerm: dto.searchTerm,
         filters: dto.filters,
-        latitude: dto.latitude,
-        longitude: dto.longitude,
-        userId: dto.userId,
+        destinationLocation: {
+          latitude: dto.destinationLocation.latitude,
+          longitude: dto.destinationLocation.longitude,
+          searchTerm: dto.destinationLocation.searchTerm,
+        },
+        userId: user.id,
       },
     });
   }

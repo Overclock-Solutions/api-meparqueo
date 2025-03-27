@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { ResponseMessage } from 'src/decorators/responseMessage.decorator';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   REPONSE_DELETE_USER_200,
   REPONSE_FIND_ALL_USER_200,
@@ -42,6 +42,7 @@ import { CreateUserLocationDto } from './dto/create-user-location.dto';
 import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
 import { CreateUserSearchDto } from './dto/create-user-search.dto';
 import { PaginatedRecentlyParkedResponseDto } from './dto/recently-parked-response.dto';
+import { ActiveUser } from '../auth/decorators/session.decorator';
 
 @ApiTags('Usuarios')
 @ApiHeader({
@@ -139,27 +140,36 @@ export class UserController {
   @ApiOperation({ summary: 'Registrar ubicación de usuario' })
   @ApiBody({ type: CreateUserLocationDto })
   @ResponseMessage('Ubicación registrada exitosamente')
-  @Auth([Role.ADMIN])
-  async createUserLocation(@Body() dto: CreateUserLocationDto) {
-    return this.userService.createUserLocation(dto);
+  @Auth([Role.USER])
+  async createUserLocation(
+    @Body() dto: CreateUserLocationDto,
+    @ActiveUser() user: User,
+  ) {
+    return this.userService.createUserLocation(dto, user);
   }
 
   @Post('recently-parked')
   @ApiOperation({ summary: 'Registrar estacionamiento reciente' })
   @ApiBody({ type: CreateRecentlyParkedDto })
   @ResponseMessage('Estacionamiento reciente registrado')
-  @Auth([Role.ADMIN])
-  async createRecentlyParked(@Body() dto: CreateRecentlyParkedDto) {
-    return this.userService.createRecentlyParked(dto);
+  @Auth([Role.USER])
+  async createRecentlyParked(
+    @Body() dto: CreateRecentlyParkedDto,
+    @ActiveUser() user: User,
+  ) {
+    return this.userService.createRecentlyParked(dto, user);
   }
 
   @Post('search')
   @ApiOperation({ summary: 'Registrar búsqueda de usuario' })
   @ApiBody({ type: CreateUserSearchDto })
   @ResponseMessage('Búsqueda registrada exitosamente')
-  @Auth([Role.ADMIN])
-  async createUserSearch(@Body() dto: CreateUserSearchDto) {
-    return this.userService.createUserSearch(dto);
+  @Auth([Role.USER])
+  async createUserSearch(
+    @Body() dto: CreateUserSearchDto,
+    @ActiveUser() user: User,
+  ) {
+    return this.userService.createUserSearch(dto, user);
   }
 
   @Get(':userId/recently-parked')

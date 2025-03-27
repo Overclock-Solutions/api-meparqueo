@@ -1,4 +1,3 @@
-// webhook-payload.dto.ts
 import {
   IsNotEmpty,
   IsString,

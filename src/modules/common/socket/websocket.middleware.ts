@@ -24,8 +24,7 @@ export const AuthWsMiddleware = (
       socket.data.user = user;
 
       next();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       next(new Error('No autorizado'));
     }
   };

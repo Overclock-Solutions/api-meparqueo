@@ -98,8 +98,7 @@ export class CloudinaryProvider implements StorageProvider {
           format: result.format,
         },
       };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       throw new Error(`File with id ${fileId} not found`);
     }
   }

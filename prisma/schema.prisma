@@ -149,25 +149,23 @@ model UserLocation {
 }
 
 model RecentlyParkingLot {
-  id           String     @id @default(uuid())
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  parkingLotId String
-  parkingLot   ParkingLot @relation(fields: [parkingLotId], references: [id])
-  viewedAt     DateTime   @default(now())
-
-  @@unique([userId, parkingLotId])
+  id                  String     @id @default(uuid())
+  userId              String
+  destinationLocation Json
+  distanceKm          Float?
+  user                User       @relation(fields: [userId], references: [id])
+  parkingLotId        String
+  parkingLot          ParkingLot @relation(fields: [parkingLotId], references: [id])
+  viewedAt            DateTime   @default(now())
 }
 
 model UserSearch {
-  id         String   @id @default(uuid())
-  searchTerm String // Término de búsqueda utilizado
-  filters    Json? // Filtros aplicados (ej: {priceRange: [0,10], services: ["CAR_WASH"]})
-  latitude   Float? // Ubicación desde donde se realizó la búsqueda
-  longitude  Float? // Ubicación desde donde se realizó la búsqueda
-  timestamp  DateTime @default(now())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  id                  String   @id @default(uuid())
+  destinationLocation Json
+  filters             Json?
+  timestamp           DateTime @default(now())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([timestamp])

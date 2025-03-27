@@ -95,8 +95,7 @@ export class AwsS3Provider implements StorageProvider {
         mimeType: metadata.ContentType,
         metadata: metadata.Metadata,
       };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       throw new Error(`File with id ${fileId} not found`);
     }
   }
