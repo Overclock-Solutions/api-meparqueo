@@ -170,3 +170,10 @@ model UserSearch {
   @@index([userId])
   @@index([timestamp])
 }
+
+enum DistanceMode {
+  DRIVING
+  WALKING
+  BICYCLING
+  TRANSIT
+}

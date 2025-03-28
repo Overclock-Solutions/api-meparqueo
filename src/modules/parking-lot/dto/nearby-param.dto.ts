@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsEnum,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
@@ -9,6 +10,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { DistanceMode } from '@prisma/client';
 
 export class NearbyParamsDto {
   @ApiProperty({
@@ -38,4 +40,8 @@ export class NearbyParamsDto {
   @Min(1)
   @Max(100)
   radiusKm: number;
+
+  @IsEnum(DistanceMode)
+  @IsNotEmpty()
+  distanceMode: DistanceMode;
 }

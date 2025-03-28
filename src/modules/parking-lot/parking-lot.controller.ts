@@ -107,6 +107,7 @@ export class ParkingLotController {
       query.lat,
       query.lng,
       query.radiusKm,
+      query.distanceMode,
     );
   }
 
