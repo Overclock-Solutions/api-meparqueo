@@ -96,6 +96,7 @@
     "testEnvironment": "node"
   },
   "prisma": {
-    "seed": "ts-node src/core/seed-example.ts"
+    "seed": "ts-node src/core/seed.ts",
+    "seed-example": "ts-node src/core/seed-example.ts"
   }
 }
