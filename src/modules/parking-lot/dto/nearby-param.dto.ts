@@ -10,8 +10,13 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { DistanceMode } from '@prisma/client';
 
+export enum DistanceMode {
+  WALKING,
+  DRIVING,
+  BICYCLING,
+  TRANSIT,
+}
 export class NearbyParamsDto {
   @ApiProperty({
     description: 'Latitude',
@@ -41,7 +46,12 @@ export class NearbyParamsDto {
   @Max(100)
   radiusKm: number;
 
-  @IsEnum(DistanceMode)
+  @ApiProperty({
+    description: 'Distance mode',
+    enum: ['walking', 'driving', 'bicycling', 'transit'],
+    example: 'walking',
+  })
   @IsNotEmpty()
+  @IsEnum(DistanceMode)
   distanceMode: DistanceMode;
 }

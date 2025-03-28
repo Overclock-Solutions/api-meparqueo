@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {
-  DistanceMode,
   ParkingLot,
   ParkingLotAvailability,
   ParkingLotStatus,
@@ -12,6 +11,7 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { GlobalGateway } from '../common/socket/global.gateway';
 import { MapsService } from './maps/maps.service';
+import { DistanceMode } from './dto/nearby-param.dto';
 
 @Injectable()
 export class ParkingLotService extends Service {
