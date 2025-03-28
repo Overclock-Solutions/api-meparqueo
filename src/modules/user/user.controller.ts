@@ -172,7 +172,7 @@ export class UserController {
     return this.userService.createUserSearch(dto, user);
   }
 
-  @Get(':userId/recently-parked')
+  @Get('recently/parked')
   @ApiOperation({ summary: 'Obtener parqueaderos recientes con paginación' })
   @ApiParam({ name: 'userId', description: 'ID del usuario' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
@@ -182,14 +182,14 @@ export class UserController {
     type: PaginatedRecentlyParkedResponseDto,
   })
   @ResponseMessage('Parqueaderos recientes obtenidos')
-  @Auth([Role.ADMIN])
+  @Auth([Role.USER])
   async getRecentlyParked(
-    @Param('userId') userId: string,
+    @ActiveUser() user: User,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
     return this.userService.getRecentlyParked(
-      userId,
+      user.id,
       Number(page),
       Number(limit),
     );
