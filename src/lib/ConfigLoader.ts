@@ -13,6 +13,8 @@ export default (): Config => {
     CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET,
     CLIENT_URL,
+    GOOGLE_MAPS_API_KEY,
+    GOOGLE_MAPS_API_URL,
   } = process.env;
   if (!PORT || !DATABASE_URL || !JWT_SECRET) {
     throw new Error('Missing environment variables');
@@ -37,6 +39,12 @@ export default (): Config => {
       apiKey: CLOUDINARY_API_KEY,
       apiSecret: CLOUDINARY_API_SECRET,
       cloudName: CLOUDINARY_CLOUD_NAME,
+    },
+    google: {
+      maps: {
+        apiKey: GOOGLE_MAPS_API_KEY,
+        apiUrl: GOOGLE_MAPS_API_URL,
+      },
     },
   };
 };

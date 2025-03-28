@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsEnum,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
@@ -10,6 +11,12 @@ import {
   Min,
 } from 'class-validator';
 
+export enum DistanceMode {
+  WALKING,
+  DRIVING,
+  BICYCLING,
+  TRANSIT,
+}
 export class NearbyParamsDto {
   @ApiProperty({
     description: 'Latitude',
@@ -38,4 +45,13 @@ export class NearbyParamsDto {
   @Min(1)
   @Max(100)
   radiusKm: number;
+
+  @ApiProperty({
+    description: 'Distance mode',
+    enum: ['walking', 'driving', 'bicycling', 'transit'],
+    example: 'walking',
+  })
+  @IsNotEmpty()
+  @IsEnum(DistanceMode)
+  distanceMode: DistanceMode;
 }
