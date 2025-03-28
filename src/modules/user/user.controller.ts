@@ -172,7 +172,7 @@ export class UserController {
     return this.userService.createUserSearch(dto, user);
   }
 
-  @Get('recently-parked')
+  @Get('recently/stored/parkings')
   @ApiOperation({ summary: 'Obtener parqueaderos recientes con paginación' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
