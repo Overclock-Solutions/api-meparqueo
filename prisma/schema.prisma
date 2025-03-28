@@ -129,6 +129,7 @@ model Report {
   reason       ReportReason
   comment      String
   status       ReportStatus @default(PENDING)
+  globalStatus GlobalStatus @default(ACTIVE)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   userId       String
@@ -138,34 +139,37 @@ model Report {
 }
 
 model UserLocation {
-  id        String   @id @default(uuid())
-  latitude  Float
-  longitude Float
-  timestamp DateTime @default(now())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id           String       @id @default(uuid())
+  latitude     Float
+  longitude    Float
+  timestamp    DateTime     @default(now())
+  globalStatus GlobalStatus @default(ACTIVE)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model RecentlyParkingLot {
-  id                  String     @id @default(uuid())
+  id                  String       @id @default(uuid())
   userId              String
   destinationLocation Json
   distanceKm          Float?
-  user                User       @relation(fields: [userId], references: [id])
+  user                User         @relation(fields: [userId], references: [id])
   parkingLotId        String
-  parkingLot          ParkingLot @relation(fields: [parkingLotId], references: [id])
-  viewedAt            DateTime   @default(now())
+  parkingLot          ParkingLot   @relation(fields: [parkingLotId], references: [id])
+  globalStatus        GlobalStatus @default(ACTIVE)
+  viewedAt            DateTime     @default(now())
 }
 
 model UserSearch {
-  id                  String   @id @default(uuid())
+  id                  String       @id @default(uuid())
   destinationLocation Json
   filters             Json?
-  timestamp           DateTime @default(now())
+  globalStatus        GlobalStatus @default(ACTIVE)
+  timestamp           DateTime     @default(now())
   userId              String
-  user                User     @relation(fields: [userId], references: [id])
+  user                User         @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([timestamp])
