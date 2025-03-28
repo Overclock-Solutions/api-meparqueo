@@ -18,4 +18,10 @@ export type Config = {
     apiKey: string;
     apiSecret: string;
   };
+  google: {
+    maps: {
+      apiKey: string;
+      apiUrl: string;
+    };
+  };
 };

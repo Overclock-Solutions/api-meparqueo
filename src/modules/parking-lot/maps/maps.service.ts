@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DistanceMode } from '@prisma/client';
 import axios from 'axios';
 @Injectable()
 export class MapsService {
-  private readonly apiUrl = process.env.GOOGLE_MAPS_API_URL;
-  private readonly apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  private readonly apiUrl: string;
+  private readonly apiKey: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.apiUrl = this.configService.get<string>('google.maps.apiUrl');
+    this.apiKey = this.configService.get<string>('google.maps.apiKey');
+  }
 
   public async getDistance(
     latOrigin: number,
