@@ -48,8 +48,8 @@ export class NearbyParamsDto {
 
   @ApiProperty({
     description: 'Distance mode',
-    enum: ['walking', 'driving', 'bicycling', 'transit'],
-    example: 'walking',
+    enum: ['WALKING', 'DRIVING', 'BICYCLING', 'TRANSIT'],
+    example: 'WALKING',
   })
   @IsNotEmpty()
   @IsEnum(DistanceMode)
