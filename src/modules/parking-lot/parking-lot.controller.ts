@@ -100,13 +100,14 @@ export class ParkingLotController {
   @Get('parking-lot/find/nearby')
   @ApiOperation({ summary: 'Buscar parqueaderos cercanos' })
   @ApiResponse({ status: 200, example: RESPONSE_FIND_NEARBY })
-  @Auth([Role.USER])
+  //@Auth([Role.USER])
   @ResponseMessage('Parqueaderos cercanos encontrados correctamente')
   async findNearby(@Query(ValidationPipe) query: NearbyParamsDto) {
     return this.parkingLotService.findNearby(
       query.lat,
       query.lng,
       query.radiusKm,
+      query.distanceMode,
     );
   }
 

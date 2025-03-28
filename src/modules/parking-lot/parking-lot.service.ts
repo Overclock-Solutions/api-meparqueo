@@ -10,10 +10,15 @@ import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { GlobalGateway } from '../common/socket/global.gateway';
+import { MapsService } from './maps/maps.service';
+import { DistanceMode } from './dto/nearby-param.dto';
 
 @Injectable()
 export class ParkingLotService extends Service {
-  constructor(private readonly globalGateway: GlobalGateway) {
+  constructor(
+    private readonly globalGateway: GlobalGateway,
+    private readonly mapsService: MapsService,
+  ) {
     super(ParkingLotService.name);
   }
 
@@ -203,54 +208,50 @@ export class ParkingLotService extends Service {
     lat: number,
     lng: number,
     radiusKm: number,
+    distanceMode: DistanceMode,
   ): Promise<(ParkingLot & { imageUrls: string[]; distanceKm: number })[]> {
     this.logger?.debug(
       `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusKm} km`,
     );
 
-    // Se obtienen todos los parqueaderos abiertos
+    // Obtener todos los parqueaderos abiertos
     const allParkings = await this.prisma.parkingLot.findMany({
       where: { status: ParkingLotStatus.OPEN },
     });
 
-    // Filtrar parqueaderos dentro del radio definido
-    const nearbyParkings = allParkings.filter((parking) => {
-      const distance = this.getDistanceKm(
-        lat,
-        lng,
-        parking.latitude,
-        parking.longitude,
-      );
-      return distance <= radiusKm;
-    });
+    // Obtener distancias usando Google Maps API
+    const distances = await Promise.all(
+      allParkings.map(async (parking) => {
+        const distance = await this.mapsService.getDistance(
+          lat,
+          lng,
+          parking.latitude,
+          parking.longitude,
+          distanceMode,
+        );
+        return { parking, distance };
+      }),
+    );
 
-    // Formatear cada parqueadero con sus URLs de imagen y la distancia calculada
-    const formattedParkings = nearbyParkings.map((parking) => {
-      const distanceKm = this.getDistanceKm(
-        lat,
-        lng,
-        parking.latitude,
-        parking.longitude,
-      );
-      return {
+    // Filtrar parqueaderos dentro del radio
+    const nearbyParkings = distances
+      .filter(({ distance }) => distance <= radiusKm)
+      .map(({ parking, distance }) => ({
         ...parking,
         imageUrls: (parking.images as { url: string }[]).map(
           (image) => image.url,
         ),
-        distanceKm: Math.round(distanceKm * 10) / 10,
-      };
-    });
+        distanceKm: Math.round(distance * 10) / 10,
+      }));
 
-    // Definir el orden de disponibilidad:
-    // "MORE_THAN_FIVE" es la mejor disponibilidad, seguido de "LESS_THAN_FIVE" y finalmente "NO_AVAILABILITY"
+    // Ordenar parqueaderos
     const availabilityOrder: { [key in ParkingLotAvailability]: number } = {
       MORE_THAN_FIVE: 0,
       LESS_THAN_FIVE: 1,
       NO_AVAILABILITY: 2,
     };
 
-    // Ordenar: primero por disponibilidad, luego por precio (ascendente) y finalmente por distancia (más cercano primero)
-    formattedParkings.sort((a, b) => {
+    nearbyParkings.sort((a, b) => {
       const availComp =
         availabilityOrder[a.availability] - availabilityOrder[b.availability];
       if (availComp !== 0) return availComp;
@@ -261,6 +262,6 @@ export class ParkingLotService extends Service {
       return a.distanceKm - b.distanceKm;
     });
 
-    return formattedParkings;
+    return nearbyParkings;
   }
 }
