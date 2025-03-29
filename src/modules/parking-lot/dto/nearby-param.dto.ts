@@ -10,9 +10,9 @@ import {
   Max,
   Min,
   IsArray,
-  ArrayNotEmpty,
   ArrayUnique,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class NearbyParamsDto {
   @ApiProperty({ description: 'Latitude', example: 8.7554462 })
@@ -37,11 +37,16 @@ export class NearbyParamsDto {
   @ApiPropertyOptional({
     description:
       'Filtrar por disponibilidad (ej.: MORE_THAN_FIVE,LESS_THAN_FIVE,NO_AVAILABILITY)',
-    isArray: true,
+    type: String,
   })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').filter((item) => item.trim() !== '');
+    }
+    return value;
+  })
   @IsArray()
-  @ArrayNotEmpty()
   @ArrayUnique()
   availability?: string[];
 
@@ -64,22 +69,32 @@ export class NearbyParamsDto {
   priceMax?: number;
 
   @ApiPropertyOptional({
-    description: 'Filtrar por servicios (ej.: ["WIFI", "SECURITY"])',
-    isArray: true,
+    description: 'Filtrar por servicios (ej.: WIFI,SECURITY)',
+    type: String,
   })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').filter((item) => item.trim() !== '');
+    }
+    return value;
+  })
   @IsArray()
-  @ArrayNotEmpty()
   @ArrayUnique()
   services?: string[];
 
   @ApiPropertyOptional({
-    description: 'Filtrar por métodos de pago (ej.: ["CREDIT_CARD", "CASH"])',
-    isArray: true,
+    description: 'Filtrar por métodos de pago (ej.: CREDIT_CARD,CASH)',
+    type: String,
   })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').filter((item) => item.trim() !== '');
+    }
+    return value;
+  })
   @IsArray()
-  @ArrayNotEmpty()
   @ArrayUnique()
   paymentMethods?: string[];
 }
