@@ -107,7 +107,13 @@ export class ParkingLotController {
       query.lat,
       query.lng,
       query.radiusKm,
-      query.distanceMode,
+      {
+        availability: query.availability,
+        priceMin: query.priceMin,
+        priceMax: query.priceMax,
+        services: query.services,
+        paymentMethods: query.paymentMethods,
+      },
     );
   }
 

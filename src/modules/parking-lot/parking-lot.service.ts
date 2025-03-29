@@ -10,8 +10,8 @@ import { UpdateParkingLotDto } from './dto/update-parking-lot.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { GlobalGateway } from '../common/socket/global.gateway';
-import { MapsService } from './maps/maps.service';
-import { DistanceMode } from './dto/nearby-param.dto';
+import { MapsService } from '../google/maps/maps.service';
+import { DistanceMode } from '../google/maps/types';
 
 @Injectable()
 export class ParkingLotService extends Service {
@@ -183,26 +183,26 @@ export class ParkingLotService extends Service {
     };
   }
 
-  private degreesToRadians(deg: number): number {
-    return deg * (Math.PI / 180);
-  }
-
   async findNearby(
     lat: number,
     lng: number,
     radiusKm: number,
-    distanceMode: DistanceMode,
+    filters?: {
+      availability?: string[];
+      priceMin?: number;
+      priceMax?: number;
+      services?: string[];
+      paymentMethods?: string[];
+    },
   ): Promise<(ParkingLot & { imageUrls: string[]; distanceKm: number })[]> {
     this.logger?.debug(
       `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusKm} km`,
     );
 
-    // Obtener todos los parqueaderos abiertos
-    const allParkings = await this.prisma.parkingLot.findMany({
-      where: { status: ParkingLotStatus.OPEN },
-    });
+    // Obtener todos los parqueaderos (sin filtrar por estado)
+    const allParkings = await this.prisma.parkingLot.findMany();
 
-    // Obtener distancias usando Google Maps API
+    // Calcular distancias para cada parqueadero
     const distances = await Promise.all(
       allParkings.map(async (parking) => {
         const distance = await this.mapsService.getDistance(
@@ -210,14 +210,14 @@ export class ParkingLotService extends Service {
           lng,
           parking.latitude,
           parking.longitude,
-          distanceMode,
+          DistanceMode.WALKING,
         );
         return { parking, distance };
       }),
     );
 
     // Filtrar parqueaderos dentro del radio
-    const nearbyParkings = distances
+    let nearbyParkings = distances
       .filter(({ distance }) => distance <= radiusKm)
       .map(({ parking, distance }) => ({
         ...parking,
@@ -227,7 +227,47 @@ export class ParkingLotService extends Service {
         distanceKm: Math.round(distance * 10) / 10,
       }));
 
-    // Ordenar parqueaderos
+    // Aplicar filtros opcionales
+    if (filters) {
+      // Filtrar por disponibilidad
+      if (filters.availability && filters.availability.length > 0) {
+        nearbyParkings = nearbyParkings.filter((parking) =>
+          filters.availability!.includes(parking.availability),
+        );
+      }
+      // Filtrar por precio mínimo
+      if (filters.priceMin !== undefined) {
+        nearbyParkings = nearbyParkings.filter(
+          (parking) => parking.price >= filters.priceMin!,
+        );
+      }
+      // Filtrar por precio máximo
+      if (filters.priceMax !== undefined) {
+        nearbyParkings = nearbyParkings.filter(
+          (parking) => parking.price <= filters.priceMax!,
+        );
+      }
+      // Filtrar por servicios
+      if (filters.services && filters.services.length > 0) {
+        nearbyParkings = nearbyParkings.filter((parking) => {
+          const parkingServices = parking.services || [];
+          return filters.services!.every((service) =>
+            parkingServices.includes(service),
+          );
+        });
+      }
+      // Filtrar por métodos de pago
+      if (filters.paymentMethods && filters.paymentMethods.length > 0) {
+        nearbyParkings = nearbyParkings.filter((parking) => {
+          const parkingPayments = parking.paymentMethods || [];
+          return filters.paymentMethods!.every((method) =>
+            parkingPayments.includes(method),
+          );
+        });
+      }
+    }
+
+    // Ordenar parqueaderos: primero por disponibilidad y distancia
     const availabilityOrder: { [key in ParkingLotAvailability]: number } = {
       MORE_THAN_FIVE: 0,
       LESS_THAN_FIVE: 1,
@@ -238,9 +278,6 @@ export class ParkingLotService extends Service {
       const availComp =
         availabilityOrder[a.availability] - availabilityOrder[b.availability];
       if (availComp !== 0) return availComp;
-
-      const priceComp = a.price - b.price;
-      if (priceComp !== 0) return priceComp;
 
       return a.distanceKm - b.distanceKm;
     });

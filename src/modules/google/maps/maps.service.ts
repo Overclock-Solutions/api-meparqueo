@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { DistanceMode } from '../dto/nearby-param.dto';
+import { DistanceMode } from './types';
 @Injectable()
 export class MapsService {
   private readonly apiUrl: string;
