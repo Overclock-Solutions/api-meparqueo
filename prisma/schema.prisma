@@ -65,6 +65,7 @@ model User {
   id                 String               @id @default(uuid())
   email              String               @unique
   password           String
+  deviceId           String?
   person             Person?              @relation(fields: [personId], references: [id])
   personId           String?              @unique
   role               Role                 @default(USER)

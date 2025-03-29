@@ -24,4 +24,14 @@ export class RegisterDto {
     message: 'La contraseña es requerida',
   })
   password: string;
+
+  @ApiProperty({
+    description: 'token del dispositivo del usuario generado por firebase',
+    example:
+      'dCbT0jbLxJNbdF2nsnnoPn:APA91bGN-tDFzGrb9GiY3HpbWDAK4p2aIGJqrYeCwcCN9uN16eHYt5CVsG0ATHlq9Ap4xDhgITdA7FsKh3RrMlUKcutCqtRzfUgawFj320CSeI6lOzBEX5M',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  deviceId: string;
 }

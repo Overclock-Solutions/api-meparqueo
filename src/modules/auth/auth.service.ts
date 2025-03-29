@@ -19,6 +19,7 @@ export class AuthService extends Service {
       data: {
         email: dto.email,
         password: hashedPassword,
+        deviceId: dto.deviceId,
         role: Role.USER,
       },
     });
@@ -39,6 +40,14 @@ export class AuthService extends Service {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    // **Actualizar el FCM Token en la BD si es diferente al almacenado**
+    if (dto.deviceId && dto.deviceId !== user.deviceId) {
+      await this.prisma.user.update({
+        where: { email: dto.email },
+        data: { deviceId: dto.deviceId },
+      });
     }
 
     const payload = {
