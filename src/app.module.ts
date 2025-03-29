@@ -14,6 +14,8 @@ import {
   StorageProviderType,
 } from './modules/cloud-storage/cloud-storage.module';
 import { WebSocketsModule } from './modules/common/socket/websockets.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { FirebaseAdminProvider } from './modules/notification/provider/firebase-admin.provider';
 
 @Module({
   imports: [
@@ -31,8 +33,9 @@ import { WebSocketsModule } from './modules/common/socket/websockets.module';
     ParkingLotModule,
     NodeModule,
     UserModule,
+    NotificationModule,
   ],
   controllers: [AppController],
-  providers: [PrismaService, ResponseInterceptor],
+  providers: [PrismaService, ResponseInterceptor, FirebaseAdminProvider],
 })
 export class AppModule {}
