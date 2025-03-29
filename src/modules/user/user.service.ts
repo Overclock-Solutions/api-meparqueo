@@ -196,7 +196,12 @@ export class UserService extends Service {
       data: results.map((item) => ({
         id: item.id,
         viewedAt: item.viewedAt,
-        parkingLot: item.parkingLot,
+        parkingLot: {
+          ...item.parkingLot,
+          imageUrls: (item.parkingLot.images as { url: string }[]).map(
+            (image) => image.url,
+          ),
+        },
       })),
       pagination: {
         total,
