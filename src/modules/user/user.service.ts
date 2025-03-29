@@ -173,27 +173,31 @@ export class UserService extends Service {
   async getRecentlyParked(userId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
-    const [total, results] = await Promise.all([
-      this.prisma.recentlyParkingLot.count({
-        where: { userId },
-      }),
-      this.prisma.recentlyParkingLot.findMany({
-        where: { userId },
-        include: {
-          parkingLot: true,
-        },
-        orderBy: {
-          viewedAt: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-    ]);
+    const results = await this.prisma.recentlyParkingLot.findMany({
+      where: { userId },
+      include: {
+        parkingLot: true,
+      },
+      orderBy: {
+        viewedAt: 'desc',
+      },
+    });
 
+    const uniqueParkingLots = new Map();
+    results.forEach((item) => {
+      if (!uniqueParkingLots.has(item.parkingLotId)) {
+        uniqueParkingLots.set(item.parkingLotId, item);
+      }
+    });
+
+    const uniqueResults = Array.from(uniqueParkingLots.values());
+    const paginatedResults = uniqueResults.slice(skip, skip + limit);
+
+    const total = uniqueResults.length;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: results.map((item) => ({
+      data: paginatedResults.map((item) => ({
         id: item.id,
         viewedAt: item.viewedAt,
         parkingLot: {
