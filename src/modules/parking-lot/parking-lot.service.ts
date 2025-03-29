@@ -95,11 +95,12 @@ export class ParkingLotService extends Service {
   }
 
   async getHistory(parkingLotId: string) {
-    return await this.prisma.parkingLotHistory.findMany({
+    const histories = await this.prisma.parkingLotHistory.findMany({
       where: { parkingLotId },
-      orderBy: { updatedAt: 'asc' },
+      orderBy: { updatedAt: 'desc' },
       take: 10,
     });
+    return histories.reverse();
   }
 
   async updateEstatus(data: UpdateStatusDto): Promise<{
@@ -184,24 +185,6 @@ export class ParkingLotService extends Service {
 
   private degreesToRadians(deg: number): number {
     return deg * (Math.PI / 180);
-  }
-
-  private getDistanceKm(
-    lat1: number,
-    lng1: number,
-    lat2: number,
-    lng2: number,
-  ): number {
-    const R = 6371; // Radio de la Tierra en km
-    const dLat = this.degreesToRadians(lat2 - lat1);
-    const dLng = this.degreesToRadians(lng2 - lng1);
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(this.degreesToRadians(lat1)) *
-        Math.cos(this.degreesToRadians(lat2)) *
-        Math.sin(dLng / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
   }
 
   async findNearby(
