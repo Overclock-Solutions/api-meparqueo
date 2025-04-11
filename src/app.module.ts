@@ -14,6 +14,7 @@ import {
   StorageProviderType,
 } from './modules/cloud-storage/cloud-storage.module';
 import { WebSocketsModule } from './modules/common/socket/websockets.module';
+import { ReportModule } from './modules/report/report.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { WebSocketsModule } from './modules/common/socket/websockets.module';
     ParkingLotModule,
     NodeModule,
     UserModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, ResponseInterceptor],
