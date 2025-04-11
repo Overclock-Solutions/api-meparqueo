@@ -24,11 +24,4 @@ export type Config = {
       apiUrl: string;
     };
   };
-  firebase: {
-    admin: {
-      projectId: string;
-      privateKey: string;
-      clientEmail: string;
-    };
-  };
 };
