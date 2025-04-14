@@ -9,6 +9,7 @@ import {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
+import * as dayjs from 'dayjs';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -113,7 +114,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     response.status(status).json({
       statusCode: status,
-      timestamp: new Date().toISOString(),
+      timestamp: dayjs().toISOString(),
       success: false,
       message: standardMessage,
       errors,

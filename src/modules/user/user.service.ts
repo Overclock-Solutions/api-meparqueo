@@ -7,7 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserSearchDto } from './dto/create-user-search.dto';
 import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
 import { CreateUserLocationDto } from './dto/create-user-location.dto';
-import { CreateReportDto } from './dto/create-report.dto';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class UserService extends Service {
@@ -118,18 +118,6 @@ export class UserService extends Service {
     });
   }
 
-  async createReport(dto: CreateReportDto) {
-    return this.prisma.report.create({
-      data: {
-        reason: dto.reason,
-        comment: dto.comment,
-        status: dto.status || 'PENDING',
-        userId: dto.userId,
-        parkingLotId: dto.parkingLotId,
-      },
-    });
-  }
-
   async createUserLocation(dto: CreateUserLocationDto, user: User) {
     return this.prisma.userLocation.create({
       data: {
@@ -151,7 +139,7 @@ export class UserService extends Service {
           longitude: dto.destinationLocation.longitude,
           latitude: dto.destinationLocation.latitude,
         },
-        viewedAt: new Date(),
+        viewedAt: dayjs().toDate(),
       },
     });
   }
@@ -173,27 +161,31 @@ export class UserService extends Service {
   async getRecentlyParked(userId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
-    const [total, results] = await Promise.all([
-      this.prisma.recentlyParkingLot.count({
-        where: { userId },
-      }),
-      this.prisma.recentlyParkingLot.findMany({
-        where: { userId },
-        include: {
-          parkingLot: true,
-        },
-        orderBy: {
-          viewedAt: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-    ]);
+    const results = await this.prisma.recentlyParkingLot.findMany({
+      where: { userId },
+      include: {
+        parkingLot: true,
+      },
+      orderBy: {
+        viewedAt: 'desc',
+      },
+    });
 
+    const uniqueParkingLots = new Map();
+    results.forEach((item) => {
+      if (!uniqueParkingLots.has(item.parkingLotId)) {
+        uniqueParkingLots.set(item.parkingLotId, item);
+      }
+    });
+
+    const uniqueResults = Array.from(uniqueParkingLots.values());
+    const paginatedResults = uniqueResults.slice(skip, skip + limit);
+
+    const total = uniqueResults.length;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: results.map((item) => ({
+      data: paginatedResults.map((item) => ({
         id: item.id,
         viewedAt: item.viewedAt,
         parkingLot: {

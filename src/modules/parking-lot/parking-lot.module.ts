@@ -3,7 +3,7 @@ import { ParkingLotService } from './parking-lot.service';
 import { ParkingLotController } from './parking-lot.controller';
 import { PrismaService } from 'src/core/prisma.service';
 import { WebSocketsModule } from '../common/socket/websockets.module';
-import { MapsService } from './maps/maps.service';
+import { MapsService } from '../google/maps/maps.service';
 
 @Module({
   imports: [WebSocketsModule],

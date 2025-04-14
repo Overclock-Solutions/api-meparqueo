@@ -37,7 +37,6 @@ import {
 } from '../common/docs/responses';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { CreateReportDto } from './dto/create-report.dto';
 import { CreateUserLocationDto } from './dto/create-user-location.dto';
 import { CreateRecentlyParkedDto } from './dto/create-recently-parked.dto';
 import { CreateUserSearchDto } from './dto/create-user-search.dto';
@@ -125,15 +124,6 @@ export class UserController {
     @Body() dto: UpdatePasswordDto,
   ) {
     return this.userService.changePassword(id, dto);
-  }
-
-  @Post('report')
-  @ApiOperation({ summary: 'Crear un reporte' })
-  @ApiBody({ type: CreateReportDto })
-  @ResponseMessage('Reporte creado exitosamente')
-  @Auth([Role.ADMIN])
-  async createReport(@Body() dto: CreateReportDto) {
-    return this.userService.createReport(dto);
   }
 
   @Post('location')

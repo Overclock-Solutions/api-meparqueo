@@ -102,12 +102,20 @@ export class ParkingLotController {
   @ApiResponse({ status: 200, example: RESPONSE_FIND_NEARBY })
   @Auth([Role.USER])
   @ResponseMessage('Parqueaderos cercanos encontrados correctamente')
-  async findNearby(@Query(ValidationPipe) query: NearbyParamsDto) {
+  async findNearby(
+    @Query(new ValidationPipe({ transform: true })) query: NearbyParamsDto,
+  ) {
     return this.parkingLotService.findNearby(
       query.lat,
       query.lng,
       query.radiusKm,
-      query.distanceMode,
+      {
+        availability: query.availability,
+        priceMin: query.priceMin,
+        priceMax: query.priceMax,
+        services: query.services,
+        paymentMethods: query.paymentMethods,
+      },
     );
   }
 

@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { DistanceMode } from '../dto/nearby-param.dto';
+import { DistanceMode } from './types';
+import { Service } from 'src/service';
 @Injectable()
-export class MapsService {
+export class MapsService extends Service {
   private readonly apiUrl: string;
   private readonly apiKey: string;
 
   constructor(private readonly configService: ConfigService) {
+    super(MapsService.name);
     this.apiUrl = this.configService.get<string>('google.maps.apiUrl');
     this.apiKey = this.configService.get<string>('google.maps.apiKey');
   }
@@ -41,8 +43,10 @@ export class MapsService {
       throw new Error(`No se pudo calcular la distancia: ${result.status}`);
     }
 
-    const distanceText = result.distance.text;
-    const distanceNumber = parseFloat(distanceText.replace(' km', ''));
-    return distanceNumber;
+    const responseMaps = {
+      distanceKm: result.distance.value / 1000,
+      durationMin: result.duration.value / 60,
+    };
+    return responseMaps;
   }
 }
