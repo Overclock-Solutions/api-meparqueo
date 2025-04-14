@@ -17,8 +17,8 @@ export class CreateReportDto {
     example: 'This parking lot does not have bathrooms',
   })
   @IsString()
-  @IsNotEmpty()
-  comment: string;
+  @IsOptional()
+  comment?: string;
 
   @ApiProperty({
     enum: ReportStatus,

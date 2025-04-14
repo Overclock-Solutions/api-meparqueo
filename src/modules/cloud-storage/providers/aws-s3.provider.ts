@@ -12,6 +12,7 @@ import {
   FileInfo,
   StorageProvider,
 } from '../interfaces/storage-provider.interface';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AwsS3Provider implements StorageProvider {
@@ -31,7 +32,7 @@ export class AwsS3Provider implements StorageProvider {
   }
 
   async upload(file: Express.Multer.File, path = 'uploads'): Promise<FileInfo> {
-    const key = `${path}/${Date.now()}-${file.originalname}`;
+    const key = `${path}/${dayjs().valueOf()}-${file.originalname}`;
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,

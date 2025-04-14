@@ -5,6 +5,7 @@ import {
   FileInfo,
   StorageProvider,
 } from '../interfaces/storage-provider.interface';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class CloudinaryProvider implements StorageProvider {
@@ -22,7 +23,7 @@ export class CloudinaryProvider implements StorageProvider {
     const dataURI = `data:${file.mimetype};base64,${base64}`;
 
     const fileNameWithoutExt = file.originalname.split('.')[0];
-    const timestamp = Date.now();
+    const timestamp = dayjs().valueOf();
     const publicId = `${path}/${timestamp}-${fileNameWithoutExt}`;
 
     const result = await new Promise<any>((resolve, reject) => {

@@ -12,6 +12,7 @@ import { CreateParkingLotDto } from './dto/create-parking-lot.dto';
 import { GlobalGateway } from '../common/socket/global.gateway';
 import { MapsService } from '../google/maps/maps.service';
 import { DistanceMode } from '../google/maps/types';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ParkingLotService extends Service {
@@ -22,9 +23,13 @@ export class ParkingLotService extends Service {
     super(ParkingLotService.name);
   }
 
-  private async formatParkingLot(
-    id: string,
-  ): Promise<ParkingLot & { nodeIds: string[] }> {
+  private async formatParkingLot(id: string): Promise<
+    ParkingLot & {
+      nodeIds: string[];
+      reportsCount: number;
+      imageUrls: string[];
+    }
+  > {
     const parkingLot = await this.prisma.parkingLot.findUnique({
       where: { id },
       include: {
@@ -39,9 +44,22 @@ export class ParkingLotService extends Service {
       throw new NotFoundException(`Parqueadero con id ${id} no encontrado`);
     }
 
+    const oneMonthAgo = dayjs().subtract(30, 'day').toDate();
+
+    const reportsCount = await this.prisma.report.count({
+      where: {
+        parkingLotId: parkingLot.id,
+        createdAt: { gte: oneMonthAgo },
+      },
+    });
+
     return {
       ...parkingLot,
+      imageUrls: (parkingLot.images as { url: string }[]).map(
+        (image) => image.url,
+      ),
       nodeIds: parkingLot.nodes.map((node) => node.id),
+      reportsCount,
     };
   }
 
@@ -256,6 +274,15 @@ export class ParkingLotService extends Service {
           DistanceMode.WALKING,
         );
 
+        const oneMonthAgo = dayjs().subtract(30, 'day').toDate();
+
+        const reportsCount = await this.prisma.report.count({
+          where: {
+            parkingLotId: parking.id,
+            createdAt: { gte: oneMonthAgo },
+          },
+        });
+
         return {
           ...parking,
           imageUrls: (parking.images as { url: string }[]).map(
@@ -263,6 +290,7 @@ export class ParkingLotService extends Service {
           ),
           distanceKm: Math.round(responseMaps.distanceKm * 10) / 10,
           durationMin: Math.floor(responseMaps.durationMin),
+          reportsCount,
         };
       }),
     );

@@ -15,17 +15,13 @@ export class ReportService extends Service {
     user: User,
     parkingLotId: string,
   ): Promise<Report> {
-    const userFind = await this.prisma.user.findUnique({
-      where: { id: user.id },
-    });
-
     const parkingLot = await this.prisma.parkingLot.findUnique({
       where: { id: parkingLotId },
     });
 
     if (!parkingLot) {
       throw new NotFoundException(
-        'This parking with id' + user.id + ' not found',
+        'This parking with id' + parkingLotId + ' not found',
       );
     }
 
@@ -33,8 +29,7 @@ export class ReportService extends Service {
       data: {
         reason: createReportDto.reason,
         comment: createReportDto.comment,
-        status: createReportDto.reportStatus,
-        userId: userFind.id,
+        userId: user.id,
         parkingLotId: parkingLot.id,
       },
     });

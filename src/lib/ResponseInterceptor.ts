@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
+import * as dayjs from 'dayjs';
 
 interface ResponseFormat<T> {
   statusCode: number;
@@ -34,7 +35,7 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data: T) => ({
         statusCode,
-        timestamp: new Date().toISOString(),
+        timestamp: dayjs().toISOString(),
         success: true,
         message,
         data,

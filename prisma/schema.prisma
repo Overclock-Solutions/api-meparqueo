@@ -127,7 +127,7 @@ model Node {
 model Report {
   id           String       @id @default(uuid())
   reason       ReportReason
-  comment      String
+  comment      String?
   status       ReportStatus @default(PENDING)
   globalStatus GlobalStatus @default(ACTIVE)
   createdAt    DateTime     @default(now())
