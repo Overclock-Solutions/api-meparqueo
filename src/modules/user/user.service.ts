@@ -181,20 +181,36 @@ export class UserService extends Service {
     const uniqueResults = Array.from(uniqueParkingLots.values());
     const paginatedResults = uniqueResults.slice(skip, skip + limit);
 
+    const oneMonthAgo = dayjs().subtract(30, 'day').toDate();
+
+    const dataWithReports = await Promise.all(
+      paginatedResults.map(async (item) => {
+        const reportsCount = await this.prisma.report.count({
+          where: {
+            parkingLotId: item.parkingLot.id,
+            createdAt: { gte: oneMonthAgo },
+          },
+        });
+
+        return {
+          id: item.id,
+          viewedAt: item.viewedAt,
+          parkingLot: {
+            ...item.parkingLot,
+            imageUrls: (item.parkingLot.images as { url: string }[]).map(
+              (image) => image.url,
+            ),
+            reportsCount,
+          },
+        };
+      }),
+    );
+
     const total = uniqueResults.length;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: paginatedResults.map((item) => ({
-        id: item.id,
-        viewedAt: item.viewedAt,
-        parkingLot: {
-          ...item.parkingLot,
-          imageUrls: (item.parkingLot.images as { url: string }[]).map(
-            (image) => image.url,
-          ),
-        },
-      })),
+      data: dataWithReports,
       pagination: {
         total,
         page,
