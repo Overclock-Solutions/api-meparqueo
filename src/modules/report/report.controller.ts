@@ -80,7 +80,7 @@ export class ReportController {
   }
 
   @Get(':parkingLotId')
-  @Auth([Role.ADMIN, Role.OWNER])
+  @Auth([Role.ADMIN])
   @ApiOperation({
     summary: 'Obtener todos los reportes por id del parqueadero',
   })
