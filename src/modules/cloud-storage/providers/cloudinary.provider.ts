@@ -33,6 +33,7 @@ export class CloudinaryProvider implements StorageProvider {
           folder: path,
           resource_type: 'auto',
           public_id: publicId,
+          format: 'jpg',
         },
         (error, result) => {
           if (error) return reject(error);
