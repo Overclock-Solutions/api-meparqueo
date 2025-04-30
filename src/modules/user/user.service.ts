@@ -133,7 +133,7 @@ export class UserService extends Service {
       data: {
         userId: user.id,
         parkingLotId: dto.parkingLotId,
-        distanceKm: dto.distanceKm,
+        distanceMt: dto.distanceMt,
         destinationLocation: {
           searchTerm: dto.destinationLocation.searchTerm,
           longitude: dto.destinationLocation.longitude,

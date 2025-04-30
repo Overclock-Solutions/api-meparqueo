@@ -79,28 +79,35 @@ model User {
 }
 
 model ParkingLot {
-  id                 String                 @id @default(uuid())
-  code               String                 @unique
-  name               String
-  address            String
-  latitude           Float
-  longitude          Float
-  status             ParkingLotStatus
-  availability       ParkingLotAvailability
-  price              Float
-  images             Json[]
-  paymentMethods     String[]
-  services           String[]
-  phoneNumber        String
-  globalStatus       GlobalStatus           @default(ACTIVE)
-  ownerId            String?
-  owner              User?                  @relation(fields: [ownerId], references: [id])
-  nodes              Node[]
-  histories          ParkingLotHistory[]
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @updatedAt
-  Report             Report[]
-  RecentlyParkingLot RecentlyParkingLot[]
+  id                     String                 @id @default(uuid())
+  code                   String                 @unique
+  name                   String
+  address                String
+  latitude               Float
+  longitude              Float
+  status                 ParkingLotStatus
+  availability           ParkingLotAvailability
+  price                  Float
+  description            String?
+  priceCarPerHour        Float?
+  priceMotorcyclePerHour Float?
+  priceMotorcyclePerDay  Float?
+  priceCarPerDay         Float?
+  comfort                Int?
+  acceptedVehicleTypes   String[] // e.g., ["CAR", "MOTORCYCLE", "BICYCLE"]
+  images                 Json[]
+  paymentMethods         String[]
+  services               String[]
+  phoneNumber            String?
+  globalStatus           GlobalStatus           @default(ACTIVE)
+  ownerId                String?
+  owner                  User?                  @relation(fields: [ownerId], references: [id])
+  nodes                  Node[]
+  histories              ParkingLotHistory[]
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  Report                 Report[]
+  RecentlyParkingLot     RecentlyParkingLot[]
 }
 
 model ParkingLotHistory {
@@ -154,7 +161,7 @@ model RecentlyParkingLot {
   id                  String       @id @default(uuid())
   userId              String
   destinationLocation Json
-  distanceKm          Float?
+  distanceMt          Float?
   user                User         @relation(fields: [userId], references: [id])
   parkingLotId        String
   parkingLot          ParkingLot   @relation(fields: [parkingLotId], references: [id])

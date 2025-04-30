@@ -128,15 +128,79 @@ export class CreateParkingLotDto {
   readonly price: number;
 
   @ApiProperty({
+    description: 'Precio por día para motocicleta',
+    type: Number,
+    example: 8000,
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  readonly priceMotorcyclePerDay?: number;
+
+  @ApiProperty({
+    description: 'Precio por día para carro',
+    type: Number,
+    example: 12000,
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  readonly priceCarPerDay?: number;
+
+  @ApiProperty({
+    description: 'Precio por hora para carro',
+    type: Number,
+    example: 3000,
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  readonly priceCarPerHour?: number;
+
+  @ApiProperty({
+    description: 'Precio por hora para motocicleta',
+    type: Number,
+    example: 1500,
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  readonly priceMotorcyclePerHour?: number;
+
+  @ApiProperty({
     description: 'Número de teléfono del parqueadero',
     type: String,
     example: '3116347710',
   })
   @IsString()
-  @IsNotEmpty({
-    message: 'El número de teléfono es obligatorio',
-  })
+  @IsOptional()
   readonly phoneNumber: string;
+
+  @ApiProperty({
+    description: 'Tipos de vehículos aceptados',
+    type: [String],
+    example: ['CAR', 'MOTORCYCLE', 'BICYCLE'],
+    isArray: true,
+  })
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true, message: 'El tipo de vehículo es obligatorio' })
+  readonly acceptedVehicleTypes: string[];
+
+  @ApiProperty({
+    description: 'Nivel de comodidad del parqueadero (1 a 5)',
+    type: Number,
+    example: 4,
+    minimum: 1,
+    maximum: 5,
+  })
+  @IsNumber()
+  @Type(() => Number)
+  @IsNotEmpty({ message: 'La comodidad es obligatoria' })
+  readonly comfort: number;
 
   @ApiProperty({
     description: 'Imágenes del parqueadero',
@@ -150,6 +214,15 @@ export class CreateParkingLotDto {
   })
   @IsOptional()
   readonly images?: { key: string; url: string }[];
+
+  @ApiProperty({
+    description: 'Descripción del parqueadero',
+    type: String,
+    example: 'Parqueadero en el centro de Montería',
+  })
+  @IsString()
+  @IsOptional()
+  readonly description?: string;
 
   @ApiProperty({
     description: 'Métodos de pago aceptados',
