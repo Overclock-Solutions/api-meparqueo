@@ -55,8 +55,8 @@ export class ParkingLotService extends Service {
 
     return {
       ...parkingLot,
-      imageUrls: (parkingLot.images as { url: string }[]).map(
-        (image) => image.url,
+      imageUrls: (parkingLot.images as { url: string }[]).map((image) =>
+        this.applyCloudinaryTransformationW500(image.url),
       ),
       nodeIds: parkingLot.nodes.map((node) => node.id),
       reportsCount,
@@ -204,7 +204,7 @@ export class ParkingLotService extends Service {
   async findNearby(
     lat: number,
     lng: number,
-    radiusKm: number,
+    radiusMt: number,
     filters?: {
       availability?: string[];
       priceMin?: number;
@@ -212,9 +212,11 @@ export class ParkingLotService extends Service {
       services?: string[];
       paymentMethods?: string[];
     },
-  ): Promise<(ParkingLot & { imageUrls: string[]; distanceKm: number })[]> {
+  ): Promise<(ParkingLot & { imageUrls: string[]; distanceMt: number })[]> {
+    const radiusKm = radiusMt / 1000;
+
     this.logger?.debug(
-      `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusKm} km`,
+      `Buscando parqueaderos cercanos para lat: ${lat}, lng: ${lng}, radio: ${radiusMt} m (${radiusKm} km)`,
     );
 
     const where: any = {};
@@ -285,10 +287,10 @@ export class ParkingLotService extends Service {
 
         return {
           ...parking,
-          imageUrls: (parking.images as { url: string }[]).map(
-            (image) => image.url,
+          imageUrls: (parking.images as { url: string }[]).map((image) =>
+            this.applyCloudinaryTransformationW500(image.url),
           ),
-          distanceKm: Math.round(responseMaps.distanceKm * 10) / 10,
+          distanceMt: Math.round(responseMaps.distanceMt * 10) / 10,
           durationMin: Math.floor(responseMaps.durationMin),
           reportsCount,
         };
@@ -296,7 +298,7 @@ export class ParkingLotService extends Service {
     );
 
     const nearbyParkings = parkingsWithDistance
-      .filter((parking) => parking.distanceKm <= radiusKm)
+      .filter((parking) => parking.distanceMt <= radiusMt)
       .sort((a, b) => {
         const availabilityOrder: { [key in ParkingLotAvailability]: number } = {
           MORE_THAN_FIVE: 0,
@@ -308,9 +310,43 @@ export class ParkingLotService extends Service {
           availabilityOrder[a.availability] - availabilityOrder[b.availability];
         if (availComp !== 0) return availComp;
 
-        return a.distanceKm - b.distanceKm;
+        return a.distanceMt - b.distanceMt;
       });
 
+    this.logger.debug(
+      `Parqueaderos cercanos encontrados: ${nearbyParkings.length}`,
+    );
+
     return nearbyParkings;
+  }
+
+  /**
+   * Aplica transformaciones de Cloudinary a una URL de imagen.
+   * @param originalUrl La URL original de Cloudinary.
+   * @returns La URL transformada o la original si no se puede aplicar la transformación.
+   */
+  private applyCloudinaryTransformationW500(
+    originalUrl: string | null | undefined,
+  ): string | null | undefined {
+    const transformation = 'w_500,c_scale,f_auto,q_auto';
+    if (
+      originalUrl &&
+      transformation &&
+      originalUrl.includes('/image/upload/')
+    ) {
+      try {
+        return originalUrl.replace(
+          '/image/upload/',
+          `/image/upload/${transformation}/`,
+        );
+      } catch (error) {
+        this.logger?.error(
+          `Error al aplicar transformación de Cloudinary a ${originalUrl}`,
+          error,
+        );
+        return originalUrl;
+      }
+    }
+    return originalUrl;
   }
 }

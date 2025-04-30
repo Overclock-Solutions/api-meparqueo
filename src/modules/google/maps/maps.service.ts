@@ -44,7 +44,7 @@ export class MapsService extends Service {
     }
 
     const responseMaps = {
-      distanceKm: result.distance.value / 1000,
+      distanceMt: result.distance.value,
       durationMin: result.duration.value / 60,
     };
     return responseMaps;

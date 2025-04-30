@@ -125,7 +125,7 @@ export const RESPONSE_FIND_NEARBY = {
       imageUrls: [
         'https://res.cloudinary.com/dxuauzyp9/image/upload/v1743052943/parking-lots/parking-lots/1743052942663-parqueadero-estacionamiento-jose-patino-1509241765.webp',
       ],
-      distanceKm: 5.2,
+      distanceMt: 520,
       durationMin: 70,
     },
   ],

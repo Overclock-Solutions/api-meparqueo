@@ -25,14 +25,14 @@ export class NearbyParamsDto {
   @IsNotEmpty()
   lng: number;
 
-  @ApiProperty({ description: 'Radio en kilómetros', example: 10 })
+  @ApiProperty({ description: 'Radio en metros', example: 200 })
   @Type(() => Number)
   @IsPositive()
   @IsNumber()
   @IsNotEmpty()
-  @Min(1)
-  @Max(100)
-  radiusKm: number;
+  @Min(100)
+  @Max(10000)
+  radiusMt: number;
 
   @ApiPropertyOptional({
     description:

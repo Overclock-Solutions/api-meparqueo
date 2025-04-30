@@ -108,7 +108,7 @@ export class ParkingLotController {
     return this.parkingLotService.findNearby(
       query.lat,
       query.lng,
-      query.radiusKm,
+      query.radiusMt,
       {
         availability: query.availability,
         priceMin: query.priceMin,
