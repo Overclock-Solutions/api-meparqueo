@@ -161,7 +161,7 @@ model RecentlyParkingLot {
   id                  String       @id @default(uuid())
   userId              String
   destinationLocation Json
-  distanceKm          Float?
+  distanceMt          Float?
   user                User         @relation(fields: [userId], references: [id])
   parkingLotId        String
   parkingLot          ParkingLot   @relation(fields: [parkingLotId], references: [id])

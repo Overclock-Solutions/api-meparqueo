@@ -22,5 +22,5 @@ export class CreateRecentlyParkedDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  distanceKm: number;
+  distanceMt: number;
 }
